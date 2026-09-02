@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+env/
+.env
+database/audit.db
+database/chroma/
+.streamlit/secrets.toml
+.DS_Store
+Thumbs.db
