@@ -374,18 +374,6 @@ st.markdown("""
         transform: translateY(0px);
     }
 
-    /* Primary button variant */
-    .stButton > button[kind="primary"] {
-        background: #4f7cff !important;
-        border-color: #4f7cff !important;
-        color: #ffffff !important;
-    }
-    .stButton > button[kind="primary"]:hover {
-        background: #3d6beb !important;
-        border-color: #3d6beb !important;
-        box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3) !important;
-    }
-
     /* ===== FORM INPUTS - CLEAN MINIMAL ===== */
     .stTextInput input, .stTextArea textarea, .stNumberInput input {
         background: #ffffff !important;
@@ -506,20 +494,6 @@ st.markdown("""
         margin: 24px 0;
     }
 
-    /* ===== SECTION TITLES ===== */
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1a2332;
-        margin: 16px 0 12px 0;
-        letter-spacing: -0.3px;
-    }
-    .section-subtitle {
-        font-size: 14px;
-        color: #8a9bb5;
-        margin-bottom: 16px;
-    }
-
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .page-header {
@@ -536,9 +510,6 @@ st.markdown("""
         }
         [data-testid="metric-container"] [data-testid="stMetricValue"] {
             font-size: 22px !important;
-        }
-        .sidebar-header .logo-text {
-            font-size: 18px;
         }
     }
 </style>
@@ -776,7 +747,7 @@ st.markdown(f"""
 
 c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
 with c1:
-    st.metric("Total Actions", len(all_actions), delta=None)
+    st.metric("Total Actions", len(all_actions))
 with c2:
     st.metric("Open Escalations", len(open_escalations))
 with c3:
@@ -893,4 +864,35 @@ with audit_tab:
                     min_value=0,
                     max_value=100,
                     format="%d",
-               
+                ),
+                "Financial": st.column_config.ProgressColumn(
+                    "Financial",
+                    min_value=0,
+                    max_value=100,
+                    format="%d",
+                ),
+                "Privacy": st.column_config.ProgressColumn(
+                    "Privacy",
+                    min_value=0,
+                    max_value=100,
+                    format="%d",
+                ),
+                "Policy": st.column_config.ProgressColumn(
+                    "Policy",
+                    min_value=0,
+                    max_value=100,
+                    format="%d",
+                ),
+            },
+        )
+
+        st.markdown(f"<p style='color:#8a9bb5;font-size:13px;margin-top:6px;'>"
+                    f"Showing {len(filtered_actions)} of {len(all_actions)} actions</p>",
+                    unsafe_allow_html=True)
+
+        st.markdown("### Action Details")
+        for action in filtered_actions:
+            dec = action["decision"]
+            color = DECISION_COLORS[dec]
+            with st.expander(
+                f"{DECISION_ICONS[dec]}  Action {action['id']}
