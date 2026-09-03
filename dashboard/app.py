@@ -54,10 +54,8 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* ===== IMPORTS ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-    /* ===== RESET ===== */
     * {
         margin: 0;
         padding: 0;
@@ -72,7 +70,6 @@ st.markdown("""
         background: #f5f7fb;
     }
 
-    /* ===== SIDEBAR ===== */
     [data-testid="stSidebar"] {
         background: #ffffff !important;
         border-right: 1px solid #eef2f6 !important;
@@ -111,7 +108,6 @@ st.markdown("""
         color: #7c3aed;
     }
 
-    /* Navigation */
     .nav-section {
         padding: 0 12px;
     }
@@ -160,7 +156,6 @@ st.markdown("""
         font-weight: 600;
     }
 
-    /* ===== MAIN HEADER ===== */
     .main-header {
         display: flex;
         justify-content: space-between;
@@ -216,7 +211,6 @@ st.markdown("""
         font-size: 14px;
     }
 
-    /* ===== METRIC CARDS ===== */
     [data-testid="metric-container"] {
         background: #ffffff !important;
         border: 1px solid #f0f2f5 !important;
@@ -242,11 +236,7 @@ st.markdown("""
         font-weight: 700 !important;
         letter-spacing: -0.5px !important;
     }
-    [data-testid="metric-container"] [data-testid="stMetricDelta"] {
-        font-size: 13px !important;
-    }
 
-    /* ===== TABS ===== */
     .stTabs [data-baseweb="tab-list"] {
         background: #ffffff;
         border-radius: 12px;
@@ -273,7 +263,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
     }
 
-    /* ===== EXPANDER ===== */
     .streamlit-expanderHeader {
         background: #ffffff !important;
         border: 1px solid #f0f2f5 !important;
@@ -296,7 +285,6 @@ st.markdown("""
         padding: 16px !important;
     }
 
-    /* ===== BUTTONS ===== */
     .stButton > button {
         border-radius: 10px !important;
         font-weight: 500 !important;
@@ -314,7 +302,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     }
 
-    /* ===== FORM INPUTS ===== */
     .stTextInput input, .stTextArea textarea, .stNumberInput input {
         background: #ffffff !important;
         border: 1px solid #e5e7eb !important;
@@ -338,7 +325,6 @@ st.markdown("""
         border-color: #7c3aed !important;
     }
 
-    /* ===== DATAFRAME ===== */
     .stDataFrame {
         border: 1px solid #f0f2f5;
         border-radius: 12px;
@@ -364,7 +350,6 @@ st.markdown("""
         background: #fafbfc !important;
     }
 
-    /* ===== ALERTS ===== */
     .stAlert {
         border-radius: 12px !important;
         border: none !important;
@@ -387,7 +372,6 @@ st.markdown("""
         border-left: 3px solid #ef4444 !important;
     }
 
-    /* ===== BAND PILLS ===== */
     .band-pill {
         display: inline-flex;
         align-items: center;
@@ -402,7 +386,6 @@ st.markdown("""
         background: #ffffff;
     }
 
-    /* ===== SCORE BAR ===== */
     .score-bar-wrap {
         background: #f3f4f6;
         border-radius: 999px;
@@ -416,7 +399,6 @@ st.markdown("""
         transition: width 0.6s ease;
     }
 
-    /* ===== DIVIDER ===== */
     .divider {
         border: none;
         height: 1px;
@@ -424,7 +406,6 @@ st.markdown("""
         margin: 24px 0;
     }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .main-header {
             flex-direction: column;
@@ -589,7 +570,6 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Filters
     st.markdown("### 🎛️ Filters")
     
     selected_decisions = st.multiselect(
@@ -610,7 +590,6 @@ with st.sidebar:
 
 # ── MAIN CONTENT ─────────────────────────────────────────────────────────────
 
-# Data loading
 all_actions = load_actions()
 filtered_actions = filter_actions(all_actions, selected_decisions, selected_action_types)
 decision_counts = count_decisions(all_actions)
@@ -890,7 +869,7 @@ with review_tab:
                         )
                         st.rerun()
 
-                                if reject_col.button(
+                if reject_col.button(
                     "🚫  Reject", key=f"reject_{action['id']}", use_container_width=True
                 ):
                     if not reviewer_name.strip():
