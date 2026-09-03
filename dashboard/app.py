@@ -174,15 +174,15 @@ def render_styles():
         """
         <style>
             .stApp {
-                background: #f8fafc;
-                color: #1e293b;
+                background: #faf8fb;
+                color: #2e1065;
             }
             .dashboard-header {
                 background: #ffffff;
-                border: 1px solid #e2e8f0;
+                border: 1px solid #e9d5ff;
                 border-radius: 16px;
-                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-                color: #1e293b;
+                box-shadow: 0 1px 3px rgba(107, 33, 168, 0.06);
+                color: #2e1065;
                 display: flex;
                 justify-content: space-between;
                 gap: 24px;
@@ -190,17 +190,17 @@ def render_styles():
                 padding: 26px 28px;
             }
             .dashboard-header h1 {
-                color: #0f172a;
+                color: #4c1d95;
                 font-size: 1.75rem;
                 font-weight: 700;
                 margin: 4px 0 8px;
             }
             .dashboard-header p {
-                color: #64748b;
+                color: #6b21a8;
                 margin: 0;
             }
             .eyebrow {
-                color: #2563eb;
+                color: #7c3aed;
                 font-size: 0.7rem;
                 font-weight: 700;
                 letter-spacing: 0.14em;
@@ -208,10 +208,10 @@ def render_styles():
             }
             .header-rule {
                 align-self: center;
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
+                background: #f5f3ff;
+                border: 1px solid #e9d5ff;
                 border-radius: 12px;
-                color: #475569;
+                color: #5b21b6;
                 font-size: 0.8rem;
                 line-height: 1.55;
                 max-width: 340px;
@@ -219,10 +219,10 @@ def render_styles():
             }
             .metric-card {
                 background: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-left: 4px solid #94a3b8;
+                border: 1px solid #e9d5ff;
+                border-left: 4px solid #c4b5fd;
                 border-radius: 12px;
-                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+                box-shadow: 0 1px 3px rgba(107, 33, 168, 0.06);
                 min-height: 120px;
                 padding: 20px;
             }
@@ -230,9 +230,9 @@ def render_styles():
             .metric-card.warning { border-left-color: #f59e0b; }
             .metric-card.escalated { border-left-color: #ef4444; }
             .metric-card.blocked { border-left-color: #7f1d1d; }
-            .metric-card.neutral { border-left-color: #3b82f6; }
+            .metric-card.neutral { border-left-color: #7c3aed; }
             .metric-label {
-                color: #64748b;
+                color: #7c3aed;
                 font-size: 0.75rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
@@ -240,14 +240,14 @@ def render_styles():
                 text-transform: uppercase;
             }
             .metric-value {
-                color: #0f172a;
+                color: #4c1d95;
                 font-size: 1.9rem;
                 font-weight: 700;
                 line-height: 1.25;
                 margin: 10px 0 5px;
             }
             .metric-detail {
-                color: #64748b;
+                color: #6b21a8;
                 font-size: 0.85rem;
                 margin: 0;
             }
@@ -264,7 +264,7 @@ def render_styles():
             .decision-badge.escalated { background: #fee2e2; color: #b42318; }
             .decision-badge.blocked { background: #f3e8ff; color: #6b21a8; }
             .action-stripe {
-                background: #94a3b8;
+                background: #c4b5fd;
                 border-radius: 10px 10px 0 0;
                 height: 3px;
                 margin-bottom: -3px;
@@ -276,7 +276,7 @@ def render_styles():
             .action-stripe.escalated { background: #ef4444; }
             .action-stripe.blocked { background: #7f1d1d; }
             .reason-heading {
-                color: #64748b;
+                color: #7c3aed;
                 font-size: 0.72rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
@@ -284,9 +284,9 @@ def render_styles():
                 text-transform: uppercase;
             }
             .reason-chip {
-                background: #f1f5f9;
+                background: #f3e8ff;
                 border-radius: 999px;
-                color: #475569;
+                color: #5b21b6;
                 display: inline-block;
                 font-size: 0.78rem;
                 margin: 0 6px 6px 0;
@@ -294,17 +294,18 @@ def render_styles():
             }
             .empty-state {
                 background: #ffffff;
-                border: 1px dashed #cbd5e1;
+                border: 1px dashed #d8b4fe;
                 border-radius: 12px;
-                color: #64748b;
+                color: #6b21a8;
                 padding: 32px;
                 text-align: center;
             }
             [data-testid="stSidebar"] {
                 background: #ffffff;
-                border-right: 1px solid #e2e8f0;
+                border-right: 1px solid #e9d5ff;
             }
             [data-testid="stTabs"] button {
+                color: #5b21b6;
                 font-weight: 600;
             }
             [data-testid="stVerticalBlockBorderWrapper"] {
