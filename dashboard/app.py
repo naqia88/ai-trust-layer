@@ -46,13 +46,13 @@ DECISION_META = {
         "label": "Escalated",
         "risk": "High risk",
         "tone": "escalated",
-        "color": "#ef4444",
+        "color": "#8b5cf6",
     },
     "blocked": {
         "label": "Blocked",
         "risk": "Critical risk",
         "tone": "blocked",
-        "color": "#9a3412",
+        "color": "#ef4444",
     },
 }
 ACTION_LABELS = {
@@ -159,6 +159,17 @@ def decision_meta(decision):
     )
 
 
+def risk_meta(score):
+    score = max(0, min(100, int(score)))
+    if score <= AUTO_APPROVE:
+        return {"label": "Low", "tone": "approved", "color": "#10b981"}
+    if score <= FLAG_FOR_REVIEW:
+        return {"label": "Moderate", "tone": "warning", "color": "#f59e0b"}
+    if score < AUTO_BLOCK:
+        return {"label": "High", "tone": "escalated", "color": "#8b5cf6"}
+    return {"label": "Critical", "tone": "blocked", "color": "#ef4444"}
+
+
 def readable_action_type(action_type):
     return ACTION_LABELS.get(action_type, action_type.replace("_", " ").title())
 
@@ -236,11 +247,40 @@ def render_styles():
                 background: #ffedd5;
                 border: 1px solid #f97316;
                 border-radius: 16px;
-                box-shadow: 0 1px 3px rgba(249, 115, 22, 0.08);
+                box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.1), 0 2px 4px -2px rgba(249, 115, 22, 0.1);
                 display: flex;
                 gap: 16px;
                 min-height: 110px;
                 padding: 18px;
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
+            }
+            .metric-tile:hover {
+                box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.12), 0 4px 6px -4px rgba(249, 115, 22, 0.12);
+                transform: translateY(-2px);
+            }
+            .band-card {
+                border: 1px solid #f97316;
+                border-radius: 12px;
+                box-shadow: 0 2px 4px -1px rgba(249, 115, 22, 0.06);
+                padding: 14px;
+                text-align: center;
+            }
+            .band-card.approved { background: #d1fae5; border-color: #10b981; }
+            .band-card.warning { background: #fef3c7; border-color: #f59e0b; }
+            .band-card.escalated { background: #ede9fe; border-color: #8b5cf6; }
+            .band-card.blocked { background: #fee2e2; border-color: #ef4444; }
+            .band-count {
+                color: #000000;
+                font-size: 1.5rem;
+                font-weight: 800;
+                line-height: 1.2;
+            }
+            .band-label {
+                color: #000000;
+                font-size: 0.72rem;
+                font-weight: 600;
+                margin-top: 4px;
+                text-transform: uppercase;
             }
             .icon-box {
                 align-items: center;
@@ -256,8 +296,8 @@ def render_styles():
             }
             .icon-box.approved { background: #d1fae5; color: #000000; }
             .icon-box.warning { background: #fef3c7; color: #000000; }
-            .icon-box.escalated { background: #fee2e2; color: #000000; }
-            .icon-box.blocked { background: #fed7aa; color: #000000; }
+            .icon-box.escalated { background: #ede9fe; color: #000000; }
+            .icon-box.blocked { background: #fee2e2; color: #000000; }
             .metric-content { flex: 1; }
             .metric-label {
                 color: #000000;
@@ -305,8 +345,40 @@ def render_styles():
             }
             .decision-badge.approved { background: #d1fae5; color: #000000; }
             .decision-badge.warning { background: #fef3c7; color: #000000; }
-            .decision-badge.escalated { background: #fee2e2; color: #000000; }
-            .decision-badge.blocked { background: #fed7aa; color: #000000; }
+            .decision-badge.escalated { background: #ede9fe; color: #000000; }
+            .decision-badge.blocked { background: #fee2e2; color: #000000; }
+            .risk-badge {
+                align-items: center;
+                border: 2px solid #f97316;
+                border-radius: 999px;
+                display: inline-flex;
+                font-weight: 700;
+                gap: 8px;
+                padding: 6px 14px 6px 8px;
+            }
+            .risk-badge.approved { border-color: #10b981; background: #d1fae5; }
+            .risk-badge.warning { border-color: #f59e0b; background: #fef3c7; }
+            .risk-badge.escalated { border-color: #8b5cf6; background: #ede9fe; }
+            .risk-badge.blocked { border-color: #ef4444; background: #fee2e2; }
+            .risk-score {
+                align-items: center;
+                background: #ffffff;
+                border-radius: 999px;
+                color: #000000;
+                display: inline-flex;
+                font-size: 0.9rem;
+                font-weight: 800;
+                height: 32px;
+                justify-content: center;
+                min-width: 32px;
+                padding: 0 8px;
+            }
+            .risk-label {
+                color: #000000;
+                font-size: 0.78rem;
+                letter-spacing: 0.02em;
+                text-transform: uppercase;
+            }
             .action-stripe {
                 background: #f97316;
                 border-radius: 10px 10px 0 0;
@@ -317,8 +389,8 @@ def render_styles():
             }
             .action-stripe.approved { background: #10b981; }
             .action-stripe.warning { background: #f59e0b; }
-            .action-stripe.escalated { background: #ef4444; }
-            .action-stripe.blocked { background: #9a3412; }
+            .action-stripe.escalated { background: #8b5cf6; }
+            .action-stripe.blocked { background: #ef4444; }
             .reason-heading {
                 color: #000000;
                 font-size: 0.72rem;
@@ -348,6 +420,7 @@ def render_styles():
                 background: #ffedd5 !important;
                 border: 1px solid #f97316 !important;
                 border-radius: 12px !important;
+                box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.08), 0 2px 4px -2px rgba(249, 115, 22, 0.08) !important;
             }
             [data-testid="stSidebar"] {
                 background: #fff7ed;
@@ -589,10 +662,37 @@ def render_metric_tile(icon, label, value, delta, tone="neutral"):
     )
 
 
+def render_decision_band_cards(decision_counts):
+    columns = st.columns(len(DECISIONS))
+    for column, decision in zip(columns, DECISIONS):
+        meta = decision_meta(decision)
+        with column:
+            st.markdown(
+                f"""
+                <div class="band-card {meta['tone']}">
+                    <div class="band-count">{decision_counts.get(decision, 0)}</div>
+                    <div class="band-label">{html.escape(meta['label'])}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
 def render_decision_badge(decision):
     meta = decision_meta(decision)
     st.markdown(
         f'<span class="decision-badge {meta["tone"]}">{html.escape(meta["label"])}</span>',
+        unsafe_allow_html=True,
+    )
+
+
+def render_risk_badge(score):
+    meta = risk_meta(score)
+    st.markdown(
+        f'<span class="risk-badge {meta["tone"]}">'
+        f'<span class="risk-score">{int(score)}</span>'
+        f'<span class="risk-label">{html.escape(meta["label"])}</span>'
+        f'</span>',
         unsafe_allow_html=True,
     )
 
@@ -641,7 +741,7 @@ def render_action_card(action, reviewer_name="", allow_resolution=False):
             )
         with badge_column:
             render_decision_badge(action["decision"])
-            st.caption(f"Score {score}/100")
+            render_risk_badge(score)
 
         st.write(action_summary(action))
         st.caption(f"{meta['risk']} · final trust score")
@@ -682,7 +782,7 @@ def show_decision_result(result):
             st.subheader("Latest trust decision")
             render_decision_badge(decision)
         with score_column:
-            st.metric("Final score", result["final_score"])
+            render_risk_badge(result["final_score"])
 
         message = f"{meta['label']} · {meta['risk']}"
         if decision == "approved":
@@ -918,6 +1018,9 @@ def page_overview(actions, open_escalations, decision_counts, average_score):
             _format_delta(avg_diff, avg_prev, is_score=True),
             "warning",
         )
+
+    st.markdown('<div class="section-title">Decision bands</div>', unsafe_allow_html=True)
+    render_decision_band_cards(decision_counts)
 
     df = actions_dataframe(actions)
     chart_columns = st.columns([2, 1])
