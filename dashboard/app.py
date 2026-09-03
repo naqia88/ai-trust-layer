@@ -174,84 +174,89 @@ def render_styles():
         """
         <style>
             .stApp {
-                background: #f6f8fc;
-                color: #172033;
+                background: #f8fafc;
+                color: #1e293b;
             }
             .dashboard-header {
-                background: linear-gradient(125deg, #102a43, #1d4ed8);
-                border-radius: 20px;
-                color: #ffffff;
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 16px;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+                color: #1e293b;
                 display: flex;
                 justify-content: space-between;
                 gap: 24px;
-                margin: 0 0 24px;
-                padding: 28px 30px;
+                margin: 0 0 28px;
+                padding: 26px 28px;
             }
             .dashboard-header h1 {
-                color: #ffffff;
-                font-size: 2rem;
+                color: #0f172a;
+                font-size: 1.75rem;
+                font-weight: 700;
                 margin: 4px 0 8px;
             }
             .dashboard-header p {
-                color: #dbeafe;
+                color: #64748b;
                 margin: 0;
             }
             .eyebrow {
-                color: #bfdbfe;
-                font-size: 0.73rem;
+                color: #2563eb;
+                font-size: 0.7rem;
                 font-weight: 700;
-                letter-spacing: 0.12em;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
             }
             .header-rule {
                 align-self: center;
-                background: rgba(255, 255, 255, 0.12);
-                border: 1px solid rgba(255, 255, 255, 0.22);
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
                 border-radius: 12px;
-                color: #eff6ff;
+                color: #475569;
                 font-size: 0.8rem;
-                line-height: 1.5;
-                max-width: 330px;
-                padding: 12px 14px;
+                line-height: 1.55;
+                max-width: 340px;
+                padding: 14px 16px;
             }
             .metric-card {
                 background: #ffffff;
-                border: 1px solid #dfe6f2;
-                border-radius: 16px;
-                box-shadow: 0 5px 14px rgba(15, 23, 42, 0.04);
-                min-height: 130px;
-                padding: 18px;
+                border: 1px solid #e2e8f0;
+                border-left: 4px solid #94a3b8;
+                border-radius: 12px;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+                min-height: 120px;
+                padding: 20px;
             }
-            .metric-card.approved { border-top: 4px solid #059669; }
-            .metric-card.warning { border-top: 4px solid #d97706; }
-            .metric-card.escalated { border-top: 4px solid #dc2626; }
-            .metric-card.blocked { border-top: 4px solid #7f1d1d; }
-            .metric-card.neutral { border-top: 4px solid #2563eb; }
+            .metric-card.approved { border-left-color: #10b981; }
+            .metric-card.warning { border-left-color: #f59e0b; }
+            .metric-card.escalated { border-left-color: #ef4444; }
+            .metric-card.blocked { border-left-color: #7f1d1d; }
+            .metric-card.neutral { border-left-color: #3b82f6; }
             .metric-label {
-                color: #667085;
-                font-size: 0.78rem;
-                font-weight: 700;
-                letter-spacing: 0.05em;
+                color: #64748b;
+                font-size: 0.75rem;
+                font-weight: 600;
+                letter-spacing: 0.04em;
                 margin: 0;
                 text-transform: uppercase;
             }
             .metric-value {
-                color: #172033;
-                font-size: 2rem;
-                font-weight: 750;
+                color: #0f172a;
+                font-size: 1.9rem;
+                font-weight: 700;
                 line-height: 1.25;
-                margin: 9px 0 5px;
+                margin: 10px 0 5px;
             }
             .metric-detail {
-                color: #667085;
+                color: #64748b;
                 font-size: 0.85rem;
                 margin: 0;
             }
             .decision-badge {
                 border-radius: 999px;
                 display: inline-block;
-                font-size: 0.76rem;
-                font-weight: 750;
-                padding: 6px 10px;
+                font-size: 0.74rem;
+                font-weight: 600;
+                padding: 5px 11px;
                 text-align: center;
             }
             .decision-badge.approved { background: #d1fae5; color: #065f46; }
@@ -259,49 +264,51 @@ def render_styles():
             .decision-badge.escalated { background: #fee2e2; color: #b42318; }
             .decision-badge.blocked { background: #f3e8ff; color: #6b21a8; }
             .action-stripe {
+                background: #94a3b8;
                 border-radius: 10px 10px 0 0;
-                height: 5px;
-                margin-bottom: -5px;
+                height: 3px;
+                margin-bottom: -3px;
                 position: relative;
                 z-index: 1;
             }
-            .action-stripe.approved { background: #059669; }
-            .action-stripe.warning { background: #d97706; }
-            .action-stripe.escalated { background: #dc2626; }
+            .action-stripe.approved { background: #10b981; }
+            .action-stripe.warning { background: #f59e0b; }
+            .action-stripe.escalated { background: #ef4444; }
             .action-stripe.blocked { background: #7f1d1d; }
             .reason-heading {
-                color: #475467;
-                font-size: 0.8rem;
-                font-weight: 700;
-                margin: 14px 0 7px;
+                color: #64748b;
+                font-size: 0.72rem;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                margin: 14px 0 8px;
                 text-transform: uppercase;
             }
             .reason-chip {
-                background: #eef2f7;
+                background: #f1f5f9;
                 border-radius: 999px;
-                color: #344054;
+                color: #475569;
                 display: inline-block;
-                font-size: 0.8rem;
-                margin: 0 5px 6px 0;
-                padding: 5px 9px;
+                font-size: 0.78rem;
+                margin: 0 6px 6px 0;
+                padding: 5px 10px;
             }
             .empty-state {
                 background: #ffffff;
                 border: 1px dashed #cbd5e1;
-                border-radius: 16px;
-                color: #475467;
-                padding: 28px;
+                border-radius: 12px;
+                color: #64748b;
+                padding: 32px;
                 text-align: center;
             }
             [data-testid="stSidebar"] {
                 background: #ffffff;
-                border-right: 1px solid #e4e7ec;
+                border-right: 1px solid #e2e8f0;
             }
             [data-testid="stTabs"] button {
-                font-weight: 650;
+                font-weight: 600;
             }
             [data-testid="stVerticalBlockBorderWrapper"] {
-                border-radius: 14px;
+                border-radius: 12px;
             }
             @media (max-width: 800px) {
                 .dashboard-header { display: block; padding: 22px; }
@@ -318,9 +325,9 @@ def render_header():
         f"""
         <div class="dashboard-header">
             <div>
-                <div class="eyebrow">RISK OPERATIONS</div>
+                <div class="eyebrow">Risk Operations</div>
                 <h1>AI Trust Layer</h1>
-                <p>Review decisions before actions are carried out.</p>
+                <p>Review trust decisions before actions are carried out.</p>
             </div>
             <div class="header-rule">
                 <strong>Decision bands</strong><br>
