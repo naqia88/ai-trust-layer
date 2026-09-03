@@ -239,96 +239,24 @@ st.markdown("""
     }
 
     /* ===== STAT CARDS ===== */
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 14px;
-        margin-bottom: 24px;
-    }
-    .stat-card {
-        background: linear-gradient(145deg, #0d1a33, #111d38);
-        border: 1px solid #1e2d4a;
-        border-radius: 14px;
-        padding: 16px 18px;
-        transition: all 0.25s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #2e4a7a, transparent);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    .stat-card:hover {
-        border-color: #2e4a7a;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    }
-    .stat-card:hover::before {
-        opacity: 1;
-    }
-    .stat-card .stat-label {
-        color: #7a9cc4;
-        font-size: 0.68rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-weight: 600;
-    }
-    .stat-card .stat-value {
-        color: #e8f0fe;
-        font-size: 1.6rem;
-        font-weight: 800;
-        margin: 4px 0 2px;
-        line-height: 1.2;
-    }
-    .stat-card .stat-change {
-        font-size: 0.7rem;
-        font-weight: 600;
-        padding: 2px 8px;
-        border-radius: 20px;
-        display: inline-block;
-    }
-    .stat-card .stat-change.positive {
-        color: #22c55e;
-        background: rgba(34, 197, 94, 0.12);
-    }
-    .stat-card .stat-change.negative {
-        color: #ef4444;
-        background: rgba(239, 68, 68, 0.12);
-    }
-    .stat-card .stat-icon {
-        position: absolute;
-        right: 14px;
-        top: 14px;
-        font-size: 1.4rem;
-        opacity: 0.3;
-    }
-
-    /* ===== METRIC CONTAINER OVERRIDE ===== */
     [data-testid="metric-container"] {
-        background: linear-gradient(145deg, #0d1a33, #111d38);
-        border: 1px solid #1e2d4a;
-        border-radius: 14px;
+        background: linear-gradient(145deg, #0d1a33, #111d38) !important;
+        border: 1px solid #1e2d4a !important;
+        border-radius: 14px !important;
         padding: 16px 18px !important;
-        transition: all 0.25s ease;
+        transition: all 0.25s ease !important;
     }
     [data-testid="metric-container"]:hover {
-        border-color: #2e4a7a;
+        border-color: #2e4a7a !important;
         transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
     }
     [data-testid="metric-container"] label {
         color: #7a9cc4 !important;
         font-size: 0.68rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.08em;
-        text-transform: uppercase;
+        text-transform: uppercase !important;
     }
     [data-testid="metric-container"] [data-testid="stMetricValue"] {
         color: #e8f0fe !important;
@@ -409,10 +337,6 @@ st.markdown("""
     }
     .stButton > button:active {
         transform: translateY(0px);
-    }
-    .stButton > button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
     }
 
     /* ===== FORM INPUTS ===== */
@@ -542,30 +466,18 @@ st.markdown("""
             align-items: flex-start;
             gap: 12px;
         }
-        .stat-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
         .stTabs [data-baseweb="tab"] {
             padding: 6px 14px;
             font-size: 0.78rem;
         }
-        .stat-card .stat-value {
-            font-size: 1.2rem;
-        }
     }
 
-    /* ===== SPECIAL ===== */
+    /* ===== DIVIDER ===== */
     .divider {
         border: none;
         height: 1px;
         background: linear-gradient(90deg, transparent, #1e2d4a, transparent);
         margin: 20px 0;
-    }
-    .section-title {
-        color: #c8d8f0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        margin: 16px 0 12px 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -770,14 +682,11 @@ average_score = (
 
 # ── Metrics Row ──────────────────────────────────────────────────────────────
 
-st.markdown('<div class="stat-grid">', unsafe_allow_html=True)
-
 c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
 with c1:
-    st.metric("Total Actions", len(all_actions), delta=None)
+    st.metric("Total Actions", len(all_actions))
 with c2:
-    st.metric("Open Escalations", len(open_escalations), 
-              delta=f"+{len(open_escalations)}" if open_escalations else "0")
+    st.metric("Open Escalations", len(open_escalations))
 with c3:
     st.metric("Avg Risk Score", f"{average_score:.1f}")
 with c4:
@@ -788,8 +697,6 @@ with c6:
     st.metric("🔺 Escalated", decision_counts["escalated"])
 with c7:
     st.metric("🚫 Blocked", decision_counts["blocked"])
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("<hr class='divider'>", unsafe_allow_html=True)
 
@@ -874,3 +781,76 @@ with audit_tab:
                 "Timestamp": a["timestamp"],
                 "Type": a["action_type"].replace("_", " ").title(),
                 "Financial": a["financial_score"],
+                "Privacy": a["privacy_score"],
+                "Policy": a["policy_score"],
+                "Final": a["final_score"],
+                "Decision": DECISION_ICONS[a["decision"]] + " " + a["decision"].replace("_", " ").title(),
+                "Resolution": a["resolution"] or "Open",
+            }
+            for a in filtered_actions
+        ])
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Final": st.column_config.ProgressColumn(
+                    "Final Score",
+                    help="Final risk score (0–100)",
+                    min_value=0,
+                    max_value=100,
+                    format="%d",
+                ),
+                "Financial": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+                "Privacy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+                "Policy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+            },
+        )
+
+        st.markdown(f"<p style='color:#7a9cc4;font-size:0.82rem;margin-top:6px;'>"
+                    f"Showing {len(filtered_actions)} of {len(all_actions)} actions</p>",
+                    unsafe_allow_html=True)
+
+        st.markdown("### Action details")
+        for action in filtered_actions:
+            dec = action["decision"]
+            color = DECISION_COLORS[dec]
+            with st.expander(
+                f"{DECISION_ICONS[dec]}  Action {action['id']}  ·  "
+                f"{action['action_type'].replace('_', ' ').title()}  ·  "
+                f"Score {action['final_score']}"
+            ):
+                left, right = st.columns([1, 1])
+                with left:
+                    st.markdown("**Score breakdown**")
+                    render_score_bar(action["financial_score"], "Financial")
+                    render_score_bar(action["privacy_score"], "Privacy")
+                    render_score_bar(action["policy_score"], "Policy")
+                    render_score_bar(action["final_score"], "Final")
+                with right:
+                    st.markdown("**Action details**")
+                    st.json(action["details"])
+
+                if action["reasons"]:
+                    st.markdown("**Risk reasons**")
+                    for r in action["reasons"]:
+                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
+                                    unsafe_allow_html=True)
+
+                if action["resolved_by"]:
+                    st.markdown(
+                        f"<div style='margin-top:10px;padding:10px;background:#0d1a33;"
+                        f"border-radius:8px;border:1px solid #1e2d4a;'>"
+                        f"<span style='color:#7a9cc4;font-size:0.82rem;'>"
+                        f"Resolved by <b style='color:#c8d8f0;'>{action['resolved_by']}</b> · "
+                        f"{action['resolution']} · {action['resolution_time']}"
+                        f"</span></div>",
+                        unsafe_allow_html=True,
+                    )
+
+# ── Review Queue ──────────────────────────────────────────────────────────────
+
+with review_tab:
+    if "review_message" in st.session_state:
+        st.success
