@@ -54,164 +54,519 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-  /* Import font */
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    /* ===== IMPORTS ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-  html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-  }
+    /* ===== RESET & BASE ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-  /* Main background */
-  .stApp {
-    background-color: #0a0f1e;
-  }
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-  /* Sidebar */
-  [data-testid="stSidebar"] {
-    background-color: #0d1526;
-    border-right: 1px solid #1e2d4a;
-  }
+    .stApp {
+        background: #080d1a;
+    }
 
-  /* Metric cards */
-  [data-testid="metric-container"] {
-    background: linear-gradient(135deg, #0d1a33 0%, #111d38 100%);
-    border: 1px solid #1e2d4a;
-    border-radius: 12px;
-    padding: 20px !important;
-    transition: border-color 0.2s;
-  }
-  [data-testid="metric-container"]:hover {
-    border-color: #2e4a7a;
-  }
-  [data-testid="metric-container"] label {
-    color: #7a9cc4 !important;
-    font-size: 0.78rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  [data-testid="metric-container"] [data-testid="stMetricValue"] {
-    color: #e8f0fe !important;
-    font-size: 2rem !important;
-    font-weight: 700 !important;
-  }
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0d1526;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #1e3a6e;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #2e4a7a;
+    }
 
-  /* Tabs */
-  .stTabs [data-baseweb="tab-list"] {
-    background-color: #0d1526;
-    border-radius: 10px;
-    padding: 4px;
-    gap: 4px;
-    border: 1px solid #1e2d4a;
-  }
-  .stTabs [data-baseweb="tab"] {
-    border-radius: 8px;
-    color: #7a9cc4;
-    font-weight: 500;
-    font-size: 0.875rem;
-    padding: 8px 20px;
-  }
-  .stTabs [aria-selected="true"] {
-    background-color: #1e3a6e !important;
-    color: #e8f0fe !important;
-  }
+    /* ===== SIDEBAR ===== */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #090f1f 0%, #0d1526 100%);
+        border-right: 1px solid rgba(30, 45, 74, 0.6);
+        padding-top: 20px;
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+        color: #8aa9d9;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        padding: 0 0 8px 0;
+        border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+    }
 
-  /* Expander */
-  .streamlit-expanderHeader {
-    background-color: #0d1a33 !important;
-    border: 1px solid #1e2d4a !important;
-    border-radius: 8px !important;
-    color: #c8d8f0 !important;
-    font-weight: 500 !important;
-  }
-  .streamlit-expanderContent {
-    background-color: #0a1528 !important;
-    border: 1px solid #1e2d4a !important;
-    border-top: none !important;
-    border-radius: 0 0 8px 8px !important;
-  }
+    /* Sidebar user profile card */
+    .sidebar-profile {
+        background: linear-gradient(135deg, #0d1a33 0%, #13203a 100%);
+        border: 1px solid #1e2d4a;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    .sidebar-profile .avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e3a6e, #2e4a7a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        font-size: 28px;
+        font-weight: 700;
+        color: #e8f0fe;
+        border: 2px solid #2e4a7a;
+        box-shadow: 0 4px 20px rgba(30, 58, 110, 0.4);
+    }
+    .sidebar-profile .name {
+        color: #e8f0fe;
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+    }
+    .sidebar-profile .email {
+        color: #7a9cc4;
+        font-size: 0.78rem;
+        margin: 2px 0 0 0;
+    }
 
-  /* Buttons */
-  .stButton > button {
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    font-size: 0.875rem !important;
-    transition: all 0.2s !important;
-    border: 1px solid #1e2d4a !important;
-    background-color: #112040 !important;
-    color: #c8d8f0 !important;
-  }
-  .stButton > button:hover {
-    background-color: #1e3a6e !important;
-    border-color: #2e4a7a !important;
-    color: #ffffff !important;
-  }
+    /* Sidebar nav items */
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: #7a9cc4;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        margin: 2px 0;
+    }
+    .nav-item:hover {
+        background: rgba(30, 58, 110, 0.4);
+        color: #e8f0fe;
+    }
+    .nav-item.active {
+        background: linear-gradient(135deg, #1e3a6e, #1a3370);
+        color: #e8f0fe;
+        border: 1px solid #2e4a7a;
+    }
+    .nav-item .icon {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+    .nav-item .badge {
+        margin-left: auto;
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.7rem;
+        padding: 1px 8px;
+        border-radius: 20px;
+        font-weight: 700;
+    }
 
-  /* Form inputs */
-  .stTextInput input, .stTextArea textarea, .stNumberInput input {
-    background-color: #0d1a33 !important;
-    border: 1px solid #1e2d4a !important;
-    border-radius: 8px !important;
-    color: #c8d8f0 !important;
-  }
-  .stSelectbox > div > div {
-    background-color: #0d1a33 !important;
-    border: 1px solid #1e2d4a !important;
-    border-radius: 8px !important;
-    color: #c8d8f0 !important;
-  }
+    /* ===== MAIN HEADER ===== */
+    .main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0 24px 0;
+        border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+        margin-bottom: 28px;
+    }
+    .main-header .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .main-header .brand .logo {
+        font-size: 2.4rem;
+        line-height: 1;
+    }
+    .main-header .brand h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #e8f0fe;
+        margin: 0;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #e8f0fe 60%, #7a9cc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .main-header .brand .subtitle {
+        font-size: 0.78rem;
+        color: #7a9cc4;
+        font-weight: 400;
+        -webkit-text-fill-color: #7a9cc4;
+    }
+    .main-header .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .header-actions .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+        margin-right: 6px;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+    .header-actions .status-text {
+        color: #7a9cc4;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
 
-  /* Dataframe */
-  .stDataFrame {
-    border: 1px solid #1e2d4a;
-    border-radius: 10px;
-    overflow: hidden;
-  }
+    /* ===== STAT CARDS ===== */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: linear-gradient(145deg, #0d1a33, #111d38);
+        border: 1px solid #1e2d4a;
+        border-radius: 14px;
+        padding: 16px 18px;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #2e4a7a, transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .stat-card:hover {
+        border-color: #2e4a7a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    .stat-card .stat-label {
+        color: #7a9cc4;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+    }
+    .stat-card .stat-value {
+        color: #e8f0fe;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 4px 0 2px;
+        line-height: 1.2;
+    }
+    .stat-card .stat-change {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    .stat-card .stat-change.positive {
+        color: #22c55e;
+        background: rgba(34, 197, 94, 0.12);
+    }
+    .stat-card .stat-change.negative {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.12);
+    }
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        font-size: 1.4rem;
+        opacity: 0.3;
+    }
 
-  /* Info / warning / success / error alerts */
-  .stAlert {
-    border-radius: 8px !important;
-    border: none !important;
-  }
+    /* ===== METRIC CONTAINER OVERRIDE ===== */
+    [data-testid="metric-container"] {
+        background: linear-gradient(145deg, #0d1a33, #111d38);
+        border: 1px solid #1e2d4a;
+        border-radius: 14px;
+        padding: 16px 18px !important;
+        transition: all 0.25s ease;
+    }
+    [data-testid="metric-container"]:hover {
+        border-color: #2e4a7a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    [data-testid="metric-container"] label {
+        color: #7a9cc4 !important;
+        font-size: 0.68rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    [data-testid="metric-container"] [data-testid="stMetricValue"] {
+        color: #e8f0fe !important;
+        font-size: 1.6rem !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="metric-container"] [data-testid="stMetricDelta"] {
+        color: #7a9cc4 !important;
+        font-size: 0.78rem !important;
+    }
 
-  /* Title */
-  h1 { color: #e8f0fe !important; font-weight: 700 !important; }
-  h2, h3 { color: #c8d8f0 !important; font-weight: 600 !important; }
+    /* ===== TABS ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        background: #0d1526;
+        border-radius: 12px;
+        padding: 4px;
+        gap: 4px;
+        border: 1px solid #1e2d4a;
+        margin-bottom: 20px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 9px;
+        color: #7a9cc4;
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 8px 22px;
+        transition: all 0.2s;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #e8f0fe;
+        background: rgba(30, 58, 110, 0.2);
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #1e3a6e, #1a3370) !important;
+        color: #e8f0fe !important;
+        box-shadow: 0 2px 12px rgba(30, 58, 110, 0.3);
+    }
 
-  /* Risk badge */
-  .risk-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-  }
+    /* ===== EXPANDER ===== */
+    .streamlit-expanderHeader {
+        background: linear-gradient(145deg, #0d1a33, #111d38) !important;
+        border: 1px solid #1e2d4a !important;
+        border-radius: 10px !important;
+        color: #c8d8f0 !important;
+        font-weight: 500 !important;
+        padding: 12px 16px !important;
+        transition: all 0.2s;
+    }
+    .streamlit-expanderHeader:hover {
+        border-color: #2e4a7a !important;
+    }
+    .streamlit-expanderContent {
+        background: #0a1528 !important;
+        border: 1px solid #1e2d4a !important;
+        border-top: none !important;
+        border-radius: 0 0 10px 10px !important;
+        padding: 16px !important;
+    }
 
-  /* Score bar */
-  .score-bar-wrap {
-    background: #0d1a33;
-    border-radius: 999px;
-    height: 6px;
-    width: 100%;
-  }
-  .score-bar-fill {
-    height: 6px;
-    border-radius: 999px;
-  }
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        transition: all 0.25s !important;
+        border: 1px solid #1e2d4a !important;
+        background: linear-gradient(145deg, #112040, #0d1a33) !important;
+        color: #c8d8f0 !important;
+        padding: 8px 20px !important;
+        height: auto !important;
+    }
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #1e3a6e, #1a3370) !important;
+        border-color: #2e4a7a !important;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(30, 58, 110, 0.3);
+    }
+    .stButton > button:active {
+        transform: translateY(0px);
+    }
+    .stButton > button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-  /* Band info pill */
-  .band-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-right: 6px;
-    margin-bottom: 4px;
-  }
+    /* ===== FORM INPUTS ===== */
+    .stTextInput input, .stTextArea textarea, .stNumberInput input {
+        background: #0d1a33 !important;
+        border: 1px solid #1e2d4a !important;
+        border-radius: 10px !important;
+        color: #e8f0fe !important;
+        padding: 10px 14px !important;
+        font-size: 0.9rem !important;
+        transition: border-color 0.2s;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus, .stNumberInput input:focus {
+        border-color: #2e4a7a !important;
+        box-shadow: 0 0 0 3px rgba(30, 58, 110, 0.15);
+    }
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
+        color: #4a6a8a !important;
+    }
+    .stSelectbox > div > div {
+        background: #0d1a33 !important;
+        border: 1px solid #1e2d4a !important;
+        border-radius: 10px !important;
+        color: #e8f0fe !important;
+    }
+    .stSelectbox > div > div:hover {
+        border-color: #2e4a7a !important;
+    }
+
+    /* ===== DATAFRAME ===== */
+    .stDataFrame {
+        border: 1px solid #1e2d4a;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .stDataFrame [data-testid="stDataFrame"] {
+        background: #0a1528;
+    }
+    .stDataFrame thead tr th {
+        background: #0d1a33 !important;
+        color: #7a9cc4 !important;
+        font-weight: 600 !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 12px !important;
+        border-bottom: 1px solid #1e2d4a !important;
+    }
+    .stDataFrame tbody tr td {
+        color: #c8d8f0 !important;
+        padding: 8px 12px !important;
+        border-bottom: 1px solid rgba(30, 45, 74, 0.3) !important;
+    }
+    .stDataFrame tbody tr:hover td {
+        background: rgba(30, 58, 110, 0.15) !important;
+    }
+
+    /* ===== ALERTS ===== */
+    .stAlert {
+        border-radius: 10px !important;
+        border: none !important;
+        padding: 14px 18px !important;
+    }
+    .stAlert > div {
+        color: #e8f0fe !important;
+    }
+    .stAlert.info {
+        background: rgba(30, 58, 110, 0.25) !important;
+        border-left: 3px solid #2e4a7a !important;
+    }
+    .stAlert.success {
+        background: rgba(34, 197, 94, 0.12) !important;
+        border-left: 3px solid #22c55e !important;
+    }
+    .stAlert.warning {
+        background: rgba(245, 158, 11, 0.12) !important;
+        border-left: 3px solid #f59e0b !important;
+    }
+    .stAlert.error {
+        background: rgba(239, 68, 68, 0.12) !important;
+        border-left: 3px solid #ef4444 !important;
+    }
+
+    /* ===== BAND PILLS ===== */
+    .band-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        border: 1px solid transparent;
+        letter-spacing: 0.02em;
+    }
+
+    /* ===== RISK BADGE ===== */
+    .risk-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    /* ===== SCORE BAR ===== */
+    .score-bar-wrap {
+        background: #0d1a33;
+        border-radius: 999px;
+        height: 6px;
+        width: 100%;
+        overflow: hidden;
+    }
+    .score-bar-fill {
+        height: 6px;
+        border-radius: 999px;
+        transition: width 0.6s ease;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .main-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+        }
+        .stat-card .stat-value {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* ===== SPECIAL ===== */
+    .divider {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #1e2d4a, transparent);
+        margin: 20px 0;
+    }
+    .section-title {
+        color: #c8d8f0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 16px 0 12px 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -279,11 +634,11 @@ def render_score_bar(score, label=""):
     color = score_color(score)
     st.markdown(f"""
         <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-          <span style="color:#7a9cc4;font-size:0.78rem;width:60px;">{label}</span>
+          <span style="color:#7a9cc4;font-size:0.75rem;font-weight:500;width:72px;flex-shrink:0;">{label}</span>
           <div class="score-bar-wrap" style="flex:1;">
             <div class="score-bar-fill" style="width:{score}%;background:{color};"></div>
           </div>
-          <span style="color:#e8f0fe;font-size:0.8rem;font-weight:600;width:28px;text-align:right;">{score}</span>
+          <span style="color:#e8f0fe;font-size:0.78rem;font-weight:700;width:28px;text-align:right;flex-shrink:0;">{score}</span>
         </div>
     """, unsafe_allow_html=True)
 
@@ -295,20 +650,20 @@ def show_decision_result(result):
     label = decision.replace("_", " ").title()
 
     st.markdown(f"""
-        <div style="background:linear-gradient(135deg,#0d1a33,#111d38);border:1px solid {color}44;
-                    border-left:4px solid {color};border-radius:10px;padding:16px 20px;margin:12px 0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span style="font-size:1.4rem;">{icon}</span>
+        <div style="background:linear-gradient(145deg,#0d1a33,#111d38);border:1px solid {color}44;
+                    border-left:4px solid {color};border-radius:12px;padding:16px 20px;margin:12px 0;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+            <span style="font-size:1.6rem;">{icon}</span>
             <span style="color:{color};font-size:1.1rem;font-weight:700;">{label}</span>
-            <span style="color:#7a9cc4;font-size:0.875rem;margin-left:auto;">
-              Final score: <b style="color:#e8f0fe;">{result['final_score']}</b>
+            <span style="color:#7a9cc4;font-size:0.85rem;margin-left:auto;">
+              Final score: <b style="color:#e8f0fe;font-size:1rem;">{result['final_score']}</b>
             </span>
           </div>
         </div>
     """, unsafe_allow_html=True)
 
     if result["reasons"]:
-        st.markdown("<div style='margin-top:8px;'>", unsafe_allow_html=True)
+        st.markdown("<div style='margin-top:6px;'>", unsafe_allow_html=True)
         for reason in result["reasons"]:
             st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {reason}</span><br>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -322,32 +677,41 @@ def submit_action(action):
 
 init_db()
 
-# ── Header ────────────────────────────────────────────────────────────────────
-
-st.markdown("""
-<div style="display:flex;align-items:center;gap:14px;padding:8px 0 20px;">
-  <span style="font-size:2.2rem;">🛡️</span>
-  <div>
-    <h1 style="margin:0;font-size:1.8rem;">AI Trust Layer</h1>
-    <p style="margin:0;color:#7a9cc4;font-size:0.9rem;">Review and govern AI-initiated actions in real time</p>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Decision band pills
-st.markdown(f"""
-<div style="margin-bottom:24px;">
-  <span class="band-pill" style="background:#22c55e18;color:#22c55e;">✅ 0–{AUTO_APPROVE} Approved</span>
-  <span class="band-pill" style="background:#f59e0b18;color:#f59e0b;">⚠️ {AUTO_APPROVE+1}–{FLAG_FOR_REVIEW} Warning</span>
-  <span class="band-pill" style="background:#f9731618;color:#f97316;">🔺 {FLAG_FOR_REVIEW+1}–{AUTO_BLOCK-1} Escalated</span>
-  <span class="band-pill" style="background:#ef444418;color:#ef4444;">🚫 {AUTO_BLOCK}–100 Blocked</span>
-</div>
-""", unsafe_allow_html=True)
-
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# ── SIDEBAR ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
+    # Profile Card
+    st.markdown("""
+        <div class="sidebar-profile">
+            <div class="avatar">👨‍💻</div>
+            <p class="name">Admin User</p>
+            <p class="email">admin@company.com</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Navigation
+    st.markdown("### Navigation")
+    
+    nav_items = [
+        ("📊", "Dashboard", True),
+        ("📋", "Audit Log", False),
+        ("🔺", "Review Queue", False),
+        ("🧪", "Test Action", False),
+        ("⚙️", "Settings", False),
+    ]
+    
+    for icon, label, active in nav_items:
+        active_class = "active" if active else ""
+        st.markdown(f"""
+            <div class="nav-item {active_class}">
+                <span class="icon">{icon}</span>
+                {label}
+            </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
     st.markdown("### 🎛️ Filters")
+    
     selected_decisions = st.multiselect(
         "Decision status",
         DECISIONS,
@@ -360,9 +724,39 @@ with st.sidebar:
         default=ACTION_TYPES,
         format_func=lambda t: t.replace("_", " ").title(),
     )
-    st.markdown("---")
-    if st.button("🔄 Refresh data", use_container_width=True):
+    
+    if st.button("🔄 Refresh", use_container_width=True):
         st.rerun()
+
+# ── MAIN HEADER ──────────────────────────────────────────────────────────────
+
+st.markdown("""
+    <div class="main-header">
+        <div class="brand">
+            <span class="logo">🛡️</span>
+            <div>
+                <h1>AI Trust Layer</h1>
+                <span class="subtitle">Real-time governance for AI actions</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <span class="status-text">
+                <span class="status-dot"></span> System Online
+            </span>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# ── Decision Band Pills ──────────────────────────────────────────────────────
+
+st.markdown(f"""
+    <div style="margin-bottom:20px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span class="band-pill" style="background:#22c55e18;color:#22c55e;border-color:#22c55e33;">✅ 0–{AUTO_APPROVE} Approved</span>
+        <span class="band-pill" style="background:#f59e0b18;color:#f59e0b;border-color:#f59e0b33;">⚠️ {AUTO_APPROVE+1}–{FLAG_FOR_REVIEW} Warning</span>
+        <span class="band-pill" style="background:#f9731618;color:#f97316;border-color:#f9731633;">🔺 {FLAG_FOR_REVIEW+1}–{AUTO_BLOCK-1} Escalated</span>
+        <span class="band-pill" style="background:#ef444418;color:#ef4444;border-color:#ef444433;">🚫 {AUTO_BLOCK}–100 Blocked</span>
+    </div>
+""", unsafe_allow_html=True)
 
 # ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -374,26 +768,37 @@ average_score = (
     sum(a["final_score"] for a in all_actions) / len(all_actions) if all_actions else 0
 )
 
-# ── Metrics row ───────────────────────────────────────────────────────────────
+# ── Metrics Row ──────────────────────────────────────────────────────────────
+
+st.markdown('<div class="stat-grid">', unsafe_allow_html=True)
 
 c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
-c1.metric("Total Actions", len(all_actions))
-c2.metric("Open Escalations", len(open_escalations))
-c3.metric("Avg Risk Score", f"{average_score:.1f}")
-c4.metric("✅ Approved", decision_counts["approved"])
-c5.metric("⚠️ Warnings", decision_counts["approved_with_warning"])
-c6.metric("🔺 Escalated", decision_counts["escalated"])
-c7.metric("🚫 Blocked", decision_counts["blocked"])
+with c1:
+    st.metric("Total Actions", len(all_actions), delta=None)
+with c2:
+    st.metric("Open Escalations", len(open_escalations), 
+              delta=f"+{len(open_escalations)}" if open_escalations else "0")
+with c3:
+    st.metric("Avg Risk Score", f"{average_score:.1f}")
+with c4:
+    st.metric("✅ Approved", decision_counts["approved"])
+with c5:
+    st.metric("⚠️ Warnings", decision_counts["approved_with_warning"])
+with c6:
+    st.metric("🔺 Escalated", decision_counts["escalated"])
+with c7:
+    st.metric("🚫 Blocked", decision_counts["blocked"])
 
-st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Charts row ────────────────────────────────────────────────────────────────
+st.markdown("<hr class='divider'>", unsafe_allow_html=True)
+
+# ── Charts Row ────────────────────────────────────────────────────────────────
 
 if all_actions:
     chart_col1, chart_col2 = st.columns([1, 2])
 
     with chart_col1:
-        # Donut chart — decision breakdown
         labels = [d.replace("_", " ").title() for d in DECISIONS]
         values = [decision_counts[d] for d in DECISIONS]
         colors = [DECISION_COLORS[d] for d in DECISIONS]
@@ -401,29 +806,28 @@ if all_actions:
         fig_donut = go.Figure(go.Pie(
             labels=labels,
             values=values,
-            hole=0.65,
-            marker=dict(colors=colors, line=dict(color="#0a0f1e", width=2)),
+            hole=0.68,
+            marker=dict(colors=colors, line=dict(color="#080d1a", width=3)),
             textinfo="none",
             hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Share: %{percent}<extra></extra>",
         ))
         fig_donut.add_annotation(
-            text=f"<b>{len(all_actions)}</b><br><span style='font-size:10px'>actions</span>",
+            text=f"<b>{len(all_actions)}</b><br><span style='font-size:9px;color:#7a9cc4;'>actions</span>",
             x=0.5, y=0.5, showarrow=False,
-            font=dict(size=18, color="#e8f0fe"),
+            font=dict(size=20, color="#e8f0fe", family="Inter"),
         )
         fig_donut.update_layout(
-            title=dict(text="Decision Breakdown", font=dict(color="#c8d8f0", size=14)),
+            title=dict(text="Decision Breakdown", font=dict(color="#c8d8f0", size=14, weight=600)),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#7a9cc4"),
-            legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)"),
-            margin=dict(t=40, b=10, l=10, r=10),
-            height=280,
+            font=dict(color="#7a9cc4", family="Inter"),
+            legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)", orientation="h", yanchor="bottom", y=-0.15),
+            margin=dict(t=40, b=30, l=10, r=10),
+            height=300,
         )
         st.plotly_chart(fig_donut, use_container_width=True)
 
     with chart_col2:
-        # Bar chart — score distribution by action type
         if filtered_actions:
             df = pd.DataFrame(filtered_actions)
             fig_bar = px.box(
@@ -438,263 +842,35 @@ if all_actions:
             fig_bar.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#7a9cc4"),
-                title=dict(font=dict(color="#c8d8f0", size=14)),
+                font=dict(color="#7a9cc4", family="Inter"),
+                title=dict(font=dict(color="#c8d8f0", size=14, weight=600)),
                 legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)"),
                 xaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0")),
                 yaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0"), range=[0, 100]),
                 margin=dict(t=40, b=10, l=10, r=10),
-                height=280,
+                height=300,
             )
             st.plotly_chart(fig_bar, use_container_width=True)
 
-st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+st.markdown("<hr class='divider'>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
 audit_tab, review_tab, submit_tab = st.tabs([
-    "📋  Audit Log",
-    f"🔺  Review Queue  {'  🔴 ' + str(len(open_escalations)) if open_escalations else ''}",
-    "🧪  Submit Test Action",
+    "📋 Audit Log",
+    f"🔺 Review Queue  {'  🔴 ' + str(len(open_escalations)) if open_escalations else ''}",
+    "🧪 Submit Test Action",
 ])
 
-# ── Audit log ─────────────────────────────────────────────────────────────────
+# ── Audit Log ─────────────────────────────────────────────────────────────────
 
 with audit_tab:
     if not filtered_actions:
         st.info("No audit records match the current filters.")
     else:
-        # Coloured table
         df = pd.DataFrame([
             {
                 "ID": a["id"],
                 "Timestamp": a["timestamp"],
                 "Type": a["action_type"].replace("_", " ").title(),
                 "Financial": a["financial_score"],
-                "Privacy": a["privacy_score"],
-                "Policy": a["policy_score"],
-                "Final": a["final_score"],
-                "Decision": DECISION_ICONS[a["decision"]] + " " + a["decision"].replace("_", " ").title(),
-                "Resolution": a["resolution"] or "Open",
-            }
-            for a in filtered_actions
-        ])
-
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "Final": st.column_config.ProgressColumn(
-                    "Final Score",
-                    help="Final risk score (0–100)",
-                    min_value=0,
-                    max_value=100,
-                    format="%d",
-                ),
-                "Financial": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "Privacy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "Policy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-            },
-        )
-
-        st.markdown(f"<p style='color:#7a9cc4;font-size:0.82rem;margin-top:6px;'>"
-                    f"Showing {len(filtered_actions)} of {len(all_actions)} actions</p>",
-                    unsafe_allow_html=True)
-
-        st.markdown("### Action details")
-        for action in filtered_actions:
-            dec = action["decision"]
-            color = DECISION_COLORS[dec]
-            with st.expander(
-                f"{DECISION_ICONS[dec]}  Action {action['id']}  ·  "
-                f"{action['action_type'].replace('_', ' ').title()}  ·  "
-                f"Score {action['final_score']}"
-            ):
-                left, right = st.columns([1, 1])
-                with left:
-                    st.markdown("**Score breakdown**")
-                    render_score_bar(action["financial_score"], "Financial")
-                    render_score_bar(action["privacy_score"], "Privacy")
-                    render_score_bar(action["policy_score"], "Policy")
-                    render_score_bar(action["final_score"], "Final")
-                with right:
-                    st.markdown("**Action details**")
-                    st.json(action["details"])
-
-                if action["reasons"]:
-                    st.markdown("**Risk reasons**")
-                    for r in action["reasons"]:
-                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
-                                    unsafe_allow_html=True)
-
-                if action["resolved_by"]:
-                    st.markdown(
-                        f"<div style='margin-top:10px;padding:10px;background:#0d1a33;"
-                        f"border-radius:8px;border:1px solid #1e2d4a;'>"
-                        f"<span style='color:#7a9cc4;font-size:0.82rem;'>"
-                        f"Resolved by <b style='color:#c8d8f0;'>{action['resolved_by']}</b> · "
-                        f"{action['resolution']} · {action['resolution_time']}"
-                        f"</span></div>",
-                        unsafe_allow_html=True,
-                    )
-
-# ── Review queue ──────────────────────────────────────────────────────────────
-
-with review_tab:
-    if "review_message" in st.session_state:
-        st.success(st.session_state.pop("review_message"))
-
-    if not open_escalations:
-        st.markdown("""
-        <div style="text-align:center;padding:48px 0;">
-          <div style="font-size:3rem;">✅</div>
-          <p style="color:#22c55e;font-weight:600;font-size:1.1rem;margin:8px 0;">All clear</p>
-          <p style="color:#7a9cc4;font-size:0.9rem;">No open escalations require attention.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"<p style='color:#f97316;font-weight:600;'>"
-                    f"🔺 {len(open_escalations)} action(s) need your review</p>",
-                    unsafe_allow_html=True)
-
-        reviewer_name = st.text_input(
-            "Your name",
-            placeholder="Enter your name before approving or rejecting",
-            help="Required for audit trail",
-        )
-
-        for action in open_escalations:
-            with st.expander(
-                f"🔺  Action {action['id']}  ·  "
-                f"{action['action_type'].replace('_', ' ').title()}  ·  "
-                f"Score {action['final_score']}"
-            ):
-                left, right = st.columns([1, 1])
-                with left:
-                    st.markdown("**Score breakdown**")
-                    render_score_bar(action["financial_score"], "Financial")
-                    render_score_bar(action["privacy_score"], "Privacy")
-                    render_score_bar(action["policy_score"], "Policy")
-                    render_score_bar(action["final_score"], "Final")
-                with right:
-                    st.markdown("**Action details**")
-                    st.json(action["details"])
-
-                if action["reasons"]:
-                    st.markdown("**Risk reasons**")
-                    for r in action["reasons"]:
-                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
-                                    unsafe_allow_html=True)
-
-                st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
-                approve_col, reject_col = st.columns(2)
-
-                if approve_col.button(
-                    "✅  Approve", key=f"approve_{action['id']}", use_container_width=True
-                ):
-                    if not reviewer_name.strip():
-                        st.warning("Enter your name before resolving.")
-                    else:
-                        resolve_action(action["id"], reviewer_name.strip(), "approved")
-                        st.session_state["review_message"] = (
-                            f"Action {action['id']} approved by {reviewer_name.strip()}."
-                        )
-                        st.rerun()
-
-                if reject_col.button(
-                    "🚫  Reject", key=f"reject_{action['id']}", use_container_width=True
-                ):
-                    if not reviewer_name.strip():
-                        st.warning("Enter your name before resolving.")
-                    else:
-                        resolve_action(action["id"], reviewer_name.strip(), "rejected")
-                        st.session_state["review_message"] = (
-                            f"Action {action['id']} rejected by {reviewer_name.strip()}."
-                        )
-                        st.rerun()
-
-    resolved = [a for a in all_actions if a["resolved_by"]]
-    if resolved:
-        st.markdown("---")
-        st.markdown("### Recently resolved")
-        for a in resolved:
-            color = "#22c55e" if a["resolution"] == "approved" else "#ef4444"
-            st.markdown(
-                f"<div style='padding:8px 14px;margin:4px 0;background:#0d1a33;"
-                f"border-radius:8px;border-left:3px solid {color};'>"
-                f"<span style='color:#c8d8f0;font-size:0.85rem;'>"
-                f"Action {a['id']} — <b style='color:{color};'>{a['resolution']}</b>"
-                f" by {a['resolved_by']} · {a['resolution_time']}"
-                f"</span></div>",
-                unsafe_allow_html=True,
-            )
-
-# ── Submit test action ────────────────────────────────────────────────────────
-
-with submit_tab:
-    if "last_result" in st.session_state:
-        show_decision_result(st.session_state["last_result"])
-        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
-
-    submission_mode = st.radio(
-        "Submission mode",
-        ["Use a sample action", "Enter action details"],
-        horizontal=True,
-    )
-
-    if submission_mode == "Use a sample action":
-        with st.form("sample_action_form"):
-            sample_name = st.selectbox(
-                "Select a sample action",
-                [
-                    "Routine PKR transfer (approved)",
-                    "Production cleanup command (warning)",
-                    "High-risk transfer (escalated)",
-                    "Email containing a CNIC (escalated)",
-                    "International high-risk transfer (blocked)",
-                ],
-            )
-            submitted = st.form_submit_button("🚀  Evaluate sample action", use_container_width=True)
-        if submitted:
-            submit_action(build_sample_action(sample_name))
-
-    else:
-        action_type = st.selectbox(
-            "Action type",
-            ACTION_TYPES,
-            format_func=lambda t: t.replace("_", " ").title(),
-        )
-
-        if action_type == "transfer_money":
-            with st.form("transfer_action_form"):
-                col_a, col_b = st.columns(2)
-                amount = col_a.number_input("Amount", min_value=0.0, step=1000.0)
-                currency = col_b.text_input("Currency", value="PKR")
-                recipient = st.text_input("Recipient")
-                description = st.text_area("Description", height=100)
-                submitted = st.form_submit_button("🚀  Evaluate transfer", use_container_width=True)
-            if submitted:
-                submit_action(create_transfer_money_action(amount, currency, recipient, description))
-
-        elif action_type == "send_email":
-            with st.form("email_action_form"):
-                col_a, col_b = st.columns(2)
-                recipient = col_a.text_input("Recipient email")
-                subject = col_b.text_input("Subject")
-                body = st.text_area("Email body", height=120)
-                has_attachment = st.checkbox("Has attachment")
-                attachment_name = st.text_input("Attachment name", disabled=not has_attachment)
-                submitted = st.form_submit_button("🚀  Evaluate email", use_container_width=True)
-            if submitted:
-                submit_action(create_send_email_action(recipient, subject, body, has_attachment, attachment_name))
-
-        else:
-            with st.form("code_action_form"):
-                code = st.text_area("Code", height=140)
-                col_a, col_b = st.columns(2)
-                environment = col_a.selectbox("Environment", ["development", "staging", "production"])
-                language = col_b.text_input("Language", value="Python")
-                submitted = st.form_submit_button("🚀  Evaluate code", use_container_width=True)
-            if submitted:
-                submit_action(create_execute_code_action(code, environment, language))
