@@ -152,7 +152,6 @@ st.info(
 
 with st.sidebar:
     st.header("Review controls")
-    reviewer_name = st.text_input("Reviewer name")
     selected_decisions = st.multiselect(
         "Decision filter",
         DECISIONS,
@@ -241,6 +240,10 @@ with review_tab:
     if not open_escalations:
         st.info("There are no open escalations.")
     else:
+        reviewer_name = st.text_input(
+            "Reviewer name",
+            placeholder="Enter your name before resolving an escalation",
+        )
         for action in open_escalations:
             with st.expander(
                 f"Action {action['id']}: {action['action_type']} "
