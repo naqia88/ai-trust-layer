@@ -50,14 +50,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Custom CSS - Complete Redesign ──────────────────────────────────────────
+# ── Custom CSS - Clean Minimalist Design ────────────────────────────────────
 
 st.markdown("""
 <style>
-    /* ===== IMPORTS ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-    /* ===== RESET & BASE ===== */
     * {
         margin: 0;
         padding: 0;
@@ -72,7 +70,7 @@ st.markdown("""
         background: #f0f4f8;
     }
 
-    /* ===== SIDEBAR - COMPLETELY REDESIGNED ===== */
+    /* Sidebar */
     [data-testid="stSidebar"] {
         background: #ffffff !important;
         border-right: none !important;
@@ -80,7 +78,6 @@ st.markdown("""
         padding-top: 30px !important;
     }
 
-    /* Sidebar Header */
     .sidebar-header {
         padding: 0 24px 24px 24px;
         border-bottom: 1px solid #eef2f6;
@@ -110,7 +107,6 @@ st.markdown("""
         padding-left: 44px;
     }
 
-    /* Sidebar User Profile */
     .sidebar-user {
         padding: 16px 20px;
         background: #f8faff;
@@ -144,7 +140,6 @@ st.markdown("""
         color: #8a9bb5;
     }
 
-    /* Sidebar Navigation - Clean & Minimal */
     .nav-section {
         padding: 0 16px;
     }
@@ -193,11 +188,7 @@ st.markdown("""
         border-radius: 20px;
         font-weight: 600;
     }
-    .nav-item.active .badge {
-        background: rgba(255, 255, 255, 0.25);
-    }
 
-    /* Sidebar Footer */
     .sidebar-footer {
         position: absolute;
         bottom: 0;
@@ -208,11 +199,6 @@ st.markdown("""
         font-size: 12px;
         color: #8a9bb5;
         text-align: center;
-    }
-
-    /* ===== MAIN CONTENT - CLEAN & MINIMAL ===== */
-    .main-container {
-        padding: 0 10px;
     }
 
     /* Header */
@@ -267,7 +253,7 @@ st.markdown("""
         50% { opacity: 0.4; }
     }
 
-    /* ===== METRIC CARDS - CLEAN MINIMAL ===== */
+    /* Metric Cards */
     [data-testid="metric-container"] {
         background: #ffffff !important;
         border: 1px solid #eef2f6 !important;
@@ -294,12 +280,8 @@ st.markdown("""
         font-weight: 700 !important;
         letter-spacing: -0.5px !important;
     }
-    [data-testid="metric-container"] [data-testid="stMetricDelta"] {
-        color: #8a9bb5 !important;
-        font-size: 13px !important;
-    }
 
-    /* ===== TABS - CLEAN MINIMAL ===== */
+    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         background: #ffffff;
         border-radius: 12px;
@@ -327,7 +309,7 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(79, 124, 255, 0.25);
     }
 
-    /* ===== EXPANDER - CLEAN MINIMAL ===== */
+    /* Expander */
     .streamlit-expanderHeader {
         background: #ffffff !important;
         border: 1px solid #eef2f6 !important;
@@ -350,7 +332,7 @@ st.markdown("""
         padding: 16px !important;
     }
 
-    /* ===== BUTTONS - CLEAN MINIMAL ===== */
+    /* Buttons */
     .stButton > button {
         border-radius: 8px !important;
         font-weight: 500 !important;
@@ -370,11 +352,8 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(79, 124, 255, 0.1) !important;
         transform: translateY(-1px);
     }
-    .stButton > button:active {
-        transform: translateY(0px);
-    }
 
-    /* ===== FORM INPUTS - CLEAN MINIMAL ===== */
+    /* Form Inputs */
     .stTextInput input, .stTextArea textarea, .stNumberInput input {
         background: #ffffff !important;
         border: 1px solid #d0d9e6 !important;
@@ -389,9 +368,6 @@ st.markdown("""
         border-color: #4f7cff !important;
         box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.08) !important;
     }
-    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
-        color: #b0c0d0 !important;
-    }
     .stSelectbox > div > div {
         background: #ffffff !important;
         border: 1px solid #d0d9e6 !important;
@@ -403,15 +379,12 @@ st.markdown("""
         border-color: #4f7cff !important;
     }
 
-    /* ===== DATAFRAME - CLEAN MINIMAL ===== */
+    /* Dataframe */
     .stDataFrame {
         border: 1px solid #eef2f6;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-    .stDataFrame [data-testid="stDataFrame"] {
-        background: #ffffff;
     }
     .stDataFrame thead tr th {
         background: #f8faff !important;
@@ -433,7 +406,7 @@ st.markdown("""
         background: #f8faff !important;
     }
 
-    /* ===== ALERTS - CLEAN MINIMAL ===== */
+    /* Alerts */
     .stAlert {
         border-radius: 10px !important;
         border: none !important;
@@ -457,7 +430,7 @@ st.markdown("""
         border-left: 3px solid #ef4444 !important;
     }
 
-    /* ===== BAND PILLS - CLEAN MINIMAL ===== */
+    /* Band Pills */
     .band-pill {
         display: inline-flex;
         align-items: center;
@@ -472,7 +445,7 @@ st.markdown("""
         background: #ffffff;
     }
 
-    /* ===== SCORE BAR - CLEAN MINIMAL ===== */
+    /* Score Bar */
     .score-bar-wrap {
         background: #f0f4f8;
         border-radius: 999px;
@@ -486,7 +459,6 @@ st.markdown("""
         transition: width 0.6s ease;
     }
 
-    /* ===== DIVIDER ===== */
     .divider {
         border: none;
         height: 1px;
@@ -494,7 +466,6 @@ st.markdown("""
         margin: 24px 0;
     }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .page-header {
             flex-direction: column;
@@ -623,10 +594,9 @@ def submit_action(action):
 
 init_db()
 
-# ── SIDEBAR - COMPLETELY REDESIGNED ────────────────────────────────────────
+# ── SIDEBAR ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    # Sidebar Header
     st.markdown("""
         <div class="sidebar-header">
             <div class="logo">
@@ -637,7 +607,6 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
     
-    # User Profile
     st.markdown("""
         <div class="sidebar-user">
             <div class="avatar">JD</div>
@@ -648,7 +617,6 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
     
-    # Navigation
     st.markdown("""
         <div class="nav-section">
             <div class="nav-label">Main</div>
@@ -678,7 +646,6 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
     
-    # Filters
     st.markdown("---")
     st.markdown("### Filters")
     
@@ -698,7 +665,6 @@ with st.sidebar:
     if st.button("🔄 Refresh", use_container_width=True):
         st.rerun()
     
-    # Sidebar Footer
     st.markdown("""
         <div class="sidebar-footer">
             Version 2.0 · © 2024 TrustLayer
@@ -707,7 +673,6 @@ with st.sidebar:
 
 # ── MAIN CONTENT ─────────────────────────────────────────────────────────────
 
-# Data loading
 all_actions = load_actions()
 filtered_actions = filter_actions(all_actions, selected_decisions, selected_action_types)
 decision_counts = count_decisions(all_actions)
@@ -718,7 +683,7 @@ average_score = (
 
 # ── PAGE HEADER ─────────────────────────────────────────────────────────────
 
-st.markdown(f"""
+st.markdown("""
     <div class="page-header">
         <div class="header-left">
             <h1>Dashboard</h1>
@@ -893,6 +858,195 @@ with audit_tab:
         st.markdown("### Action Details")
         for action in filtered_actions:
             dec = action["decision"]
-            color = DECISION_COLORS[dec]
             with st.expander(
-                f"{DECISION_ICONS[dec]}  Action {action['id']}
+                f"{DECISION_ICONS[dec]}  Action {action['id']}  ·  "
+                f"{action['action_type'].replace('_', ' ').title()}  ·  "
+                f"Score {action['final_score']}"
+            ):
+                left, right = st.columns([1, 1])
+                with left:
+                    st.markdown("**Score breakdown**")
+                    render_score_bar(action["financial_score"], "Financial")
+                    render_score_bar(action["privacy_score"], "Privacy")
+                    render_score_bar(action["policy_score"], "Policy")
+                    render_score_bar(action["final_score"], "Final")
+                with right:
+                    st.markdown("**Action details**")
+                    st.json(action["details"])
+
+                if action["reasons"]:
+                    st.markdown("**Risk reasons**")
+                    for r in action["reasons"]:
+                        st.markdown(f"<span style='color:#f59e0b;font-size:14px;'>⚡ {r}</span>",
+                                    unsafe_allow_html=True)
+
+                if action["resolved_by"]:
+                    st.markdown(
+                        f"<div style='margin-top:10px;padding:10px;background:#f8faff;"
+                        f"border-radius:8px;border:1px solid #eef2f6;'>"
+                        f"<span style='color:#4a5a72;font-size:13px;'>"
+                        f"Resolved by <b style='color:#1a2332;'>{action['resolved_by']}</b> · "
+                        f"{action['resolution']} · {action['resolution_time']}"
+                        f"</span></div>",
+                        unsafe_allow_html=True,
+                    )
+
+# ── Review Queue ──────────────────────────────────────────────────────────────
+
+with review_tab:
+    if "review_message" in st.session_state:
+        st.success(st.session_state.pop("review_message"))
+
+    if not open_escalations:
+        st.markdown("""
+        <div style="text-align:center;padding:48px 0;">
+          <div style="font-size:48px;">✅</div>
+          <p style="color:#22c55e;font-weight:600;font-size:18px;margin:8px 0;">All clear</p>
+          <p style="color:#8a9bb5;font-size:14px;">No open escalations require attention.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"<p style='color:#f97316;font-weight:600;font-size:16px;'>"
+                    f"🔺 {len(open_escalations)} action(s) need your review</p>",
+                    unsafe_allow_html=True)
+
+        reviewer_name = st.text_input(
+            "Your name",
+            placeholder="Enter your name before approving or rejecting",
+            help="Required for audit trail",
+        )
+
+        for action in open_escalations:
+            with st.expander(
+                f"🔺  Action {action['id']}  ·  "
+                f"{action['action_type'].replace('_', ' ').title()}  ·  "
+                f"Score {action['final_score']}"
+            ):
+                left, right = st.columns([1, 1])
+                with left:
+                    st.markdown("**Score breakdown**")
+                    render_score_bar(action["financial_score"], "Financial")
+                    render_score_bar(action["privacy_score"], "Privacy")
+                    render_score_bar(action["policy_score"], "Policy")
+                    render_score_bar(action["final_score"], "Final")
+                with right:
+                    st.markdown("**Action details**")
+                    st.json(action["details"])
+
+                if action["reasons"]:
+                    st.markdown("**Risk reasons**")
+                    for r in action["reasons"]:
+                        st.markdown(f"<span style='color:#f59e0b;font-size:14px;'>⚡ {r}</span>",
+                                    unsafe_allow_html=True)
+
+                st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+                approve_col, reject_col = st.columns(2)
+
+                if approve_col.button(
+                    "✅  Approve", key=f"approve_{action['id']}", use_container_width=True
+                ):
+                    if not reviewer_name.strip():
+                        st.warning("Enter your name before resolving.")
+                    else:
+                        resolve_action(action["id"], reviewer_name.strip(), "approved")
+                        st.session_state["review_message"] = (
+                            f"Action {action['id']} approved by {reviewer_name.strip()}."
+                        )
+                        st.rerun()
+
+                if reject_col.button(
+                    "🚫  Reject", key=f"reject_{action['id']}", use_container_width=True
+                ):
+                    if not reviewer_name.strip():
+                        st.warning("Enter your name before resolving.")
+                    else:
+                        resolve_action(action["id"], reviewer_name.strip(), "rejected")
+                        st.session_state["review_message"] = (
+                            f"Action {action['id']} rejected by {reviewer_name.strip()}."
+                        )
+                        st.rerun()
+
+    resolved = [a for a in all_actions if a["resolved_by"]]
+    if resolved:
+        st.markdown("---")
+        st.markdown("### Recently resolved")
+        for a in resolved[:5]:  # Show last 5 resolved
+            color = "#22c55e" if a["resolution"] == "approved" else "#ef4444"
+            st.markdown(
+                f"<div style='padding:8px 14px;margin:4px 0;background:#ffffff;"
+                f"border-radius:8px;border:1px solid #eef2f6;border-left:3px solid {color};'>"
+                f"<span style='color:#1a2332;font-size:14px;'>"
+                f"Action {a['id']} — <b style='color:{color};'>{a['resolution']}</b>"
+                f" by {a['resolved_by']} · {a['resolution_time']}"
+                f"</span></div>",
+                unsafe_allow_html=True,
+            )
+
+# ── Submit Test Action ────────────────────────────────────────────────────────
+
+with submit_tab:
+    if "last_result" in st.session_state:
+        show_decision_result(st.session_state["last_result"])
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+
+    submission_mode = st.radio(
+        "Submission mode",
+        ["Use a sample action", "Enter action details"],
+        horizontal=True,
+    )
+
+    if submission_mode == "Use a sample action":
+        with st.form("sample_action_form"):
+            sample_name = st.selectbox(
+                "Select a sample action",
+                [
+                    "Routine PKR transfer (approved)",
+                    "Production cleanup command (warning)",
+                    "High-risk transfer (escalated)",
+                    "Email containing a CNIC (escalated)",
+                    "International high-risk transfer (blocked)",
+                ],
+            )
+            submitted = st.form_submit_button("🚀  Evaluate sample action", use_container_width=True)
+        if submitted:
+            submit_action(build_sample_action(sample_name))
+
+    else:
+        action_type = st.selectbox(
+            "Action type",
+            ACTION_TYPES,
+            format_func=lambda t: t.replace("_", " ").title(),
+        )
+
+        if action_type == "transfer_money":
+            with st.form("transfer_action_form"):
+                col_a, col_b = st.columns(2)
+                amount = col_a.number_input("Amount", min_value=0.0, step=1000.0)
+                currency = col_b.text_input("Currency", value="PKR")
+                recipient = st.text_input("Recipient")
+                description = st.text_area("Description", height=100)
+                submitted = st.form_submit_button("🚀  Evaluate transfer", use_container_width=True)
+            if submitted:
+                submit_action(create_transfer_money_action(amount, currency, recipient, description))
+
+        elif action_type == "send_email":
+            with st.form("email_action_form"):
+                col_a, col_b = st.columns(2)
+                recipient = col_a.text_input("Recipient email")
+                subject = col_b.text_input("Subject")
+                body = st.text_area("Email body", height=120)
+                has_attachment = st.checkbox("Has attachment")
+                attachment_name = st.text_input("Attachment name", disabled=not has_attachment)
+                submitted = st.form_submit_button("🚀  Evaluate email", use_container_width=True)
+            if submitted:
+                submit_action(create_send_email_action(recipient, subject, body, has_attachment, attachment_name))
+
+        else:
+            with st.form("code_action_form"):
+                code = st.text_area("Code", height=140)
+                col_a, col_b = st.columns(2)
+                environment = col_a.selectbox("Environment", ["development", "staging", "production"])
+                language = col_b.text_input("Language", value="Python")
+                submitted = st.form_submit_button("🚀  Evaluate code", use_container_width=True)
+            if submitted:
+                submit_action(create_execute_code_action(code, environment, language))
