@@ -202,17 +202,17 @@ def render_styles():
         <style>
             .stApp {
                 background: #fff7ed;
-                color: #1c1917;
+                color: #000000;
             }
             .eyebrow {
-                color: #f97316;
+                color: #000000;
                 font-size: 0.7rem;
                 font-weight: 700;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
             }
             .topbar-title h1 {
-                color: #c2410c;
+                color: #000000;
                 font-size: 1.6rem;
                 font-weight: 700;
                 margin: 4px 0 0;
@@ -220,9 +220,9 @@ def render_styles():
             .avatar {
                 align-items: center;
                 background: #ffedd5;
-                border: 2px solid #fed7aa;
+                border: 2px solid #f97316;
                 border-radius: 999px;
-                color: #c2410c;
+                color: #000000;
                 display: flex;
                 font-size: 1.2rem;
                 font-weight: 700;
@@ -233,10 +233,10 @@ def render_styles():
             }
             .metric-tile {
                 align-items: center;
-                background: #ffffff;
-                border: 1px solid #fed7aa;
+                background: #ffedd5;
+                border: 1px solid #f97316;
                 border-radius: 16px;
-                box-shadow: 0 1px 3px rgba(249, 115, 22, 0.06);
+                box-shadow: 0 1px 3px rgba(249, 115, 22, 0.08);
                 display: flex;
                 gap: 16px;
                 min-height: 110px;
@@ -244,9 +244,9 @@ def render_styles():
             }
             .icon-box {
                 align-items: center;
-                background: #ffedd5;
+                background: #fed7aa;
                 border-radius: 12px;
-                color: #c2410c;
+                color: #000000;
                 display: flex;
                 flex-shrink: 0;
                 font-size: 1.6rem;
@@ -254,44 +254,44 @@ def render_styles():
                 justify-content: center;
                 width: 56px;
             }
-            .icon-box.approved { background: #d1fae5; color: #065f46; }
-            .icon-box.warning { background: #fef3c7; color: #92400e; }
-            .icon-box.escalated { background: #fee2e2; color: #b42318; }
-            .icon-box.blocked { background: #ffedd5; color: #9a3412; }
+            .icon-box.approved { background: #d1fae5; color: #000000; }
+            .icon-box.warning { background: #fef3c7; color: #000000; }
+            .icon-box.escalated { background: #fee2e2; color: #000000; }
+            .icon-box.blocked { background: #fed7aa; color: #000000; }
             .metric-content { flex: 1; }
             .metric-label {
-                color: #9a3412;
+                color: #000000;
                 font-size: 0.75rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
                 text-transform: uppercase;
             }
             .metric-value {
-                color: #7c2d12;
+                color: #000000;
                 font-size: 1.8rem;
                 font-weight: 700;
                 line-height: 1.2;
                 margin: 4px 0 2px;
             }
             .metric-delta {
-                color: #ea580c;
+                color: #000000;
                 font-size: 0.8rem;
                 font-weight: 500;
             }
             .section-title {
-                color: #7c2d12;
+                color: #000000;
                 font-size: 1.15rem;
                 font-weight: 700;
                 margin: 22px 0 14px;
             }
             .chart-card-title {
-                color: #7c2d12;
+                color: #000000;
                 font-size: 1rem;
                 font-weight: 700;
                 margin-bottom: 4px;
             }
             .chart-card-subtitle {
-                color: #9a3412;
+                color: #000000;
                 font-size: 0.8rem;
                 margin-bottom: 14px;
             }
@@ -303,12 +303,12 @@ def render_styles():
                 padding: 5px 11px;
                 text-align: center;
             }
-            .decision-badge.approved { background: #d1fae5; color: #065f46; }
-            .decision-badge.warning { background: #fef3c7; color: #92400e; }
-            .decision-badge.escalated { background: #fee2e2; color: #b42318; }
-            .decision-badge.blocked { background: #ffedd5; color: #9a3412; }
+            .decision-badge.approved { background: #d1fae5; color: #000000; }
+            .decision-badge.warning { background: #fef3c7; color: #000000; }
+            .decision-badge.escalated { background: #fee2e2; color: #000000; }
+            .decision-badge.blocked { background: #fed7aa; color: #000000; }
             .action-stripe {
-                background: #fdba74;
+                background: #f97316;
                 border-radius: 10px 10px 0 0;
                 height: 3px;
                 margin-bottom: -3px;
@@ -320,7 +320,7 @@ def render_styles():
             .action-stripe.escalated { background: #ef4444; }
             .action-stripe.blocked { background: #9a3412; }
             .reason-heading {
-                color: #9a3412;
+                color: #000000;
                 font-size: 0.72rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
@@ -328,30 +328,30 @@ def render_styles():
                 text-transform: uppercase;
             }
             .reason-chip {
-                background: #ffedd5;
+                background: #fed7aa;
                 border-radius: 999px;
-                color: #9a3412;
+                color: #000000;
                 display: inline-block;
                 font-size: 0.78rem;
                 margin: 0 6px 6px 0;
                 padding: 5px 10px;
             }
             .empty-state {
-                background: #ffffff;
-                border: 1px dashed #fdba74;
+                background: #ffedd5;
+                border: 1px dashed #f97316;
                 border-radius: 12px;
-                color: #9a3412;
+                color: #000000;
                 padding: 32px;
                 text-align: center;
             }
             [data-testid="stVerticalBlockBorderWrapper"] {
-                background: #ffffff !important;
-                border: 1px solid #fed7aa !important;
+                background: #ffedd5 !important;
+                border: 1px solid #f97316 !important;
                 border-radius: 12px !important;
             }
             [data-testid="stSidebar"] {
-                background: #ffffff;
-                border-right: 1px solid #fed7aa;
+                background: #fff7ed;
+                border-right: 1px solid #f97316;
             }
             .nav-brand {
                 align-items: center;
@@ -361,10 +361,10 @@ def render_styles():
             }
             .nav-logo {
                 align-items: center;
-                background: #fff7ed;
-                border: 1px solid #fed7aa;
+                background: #ffedd5;
+                border: 1px solid #f97316;
                 border-radius: 10px;
-                color: #f97316;
+                color: #000000;
                 display: flex;
                 font-size: 1.4rem;
                 height: 42px;
@@ -372,17 +372,17 @@ def render_styles():
                 width: 42px;
             }
             .nav-title {
-                color: #7c2d12;
+                color: #000000;
                 font-size: 1.05rem;
                 font-weight: 700;
                 line-height: 1.2;
             }
             .nav-subtitle {
-                color: #9a3412;
+                color: #000000;
                 font-size: 0.75rem;
             }
             .filter-heading {
-                color: #7c2d12;
+                color: #000000;
                 font-size: 0.8rem;
                 font-weight: 600;
                 margin-bottom: 10px;
@@ -391,7 +391,7 @@ def render_styles():
                 align-items: center;
                 border: 1px solid transparent;
                 border-radius: 10px;
-                color: #57534e;
+                color: #000000;
                 cursor: pointer;
                 display: flex;
                 font-weight: 500;
@@ -400,26 +400,98 @@ def render_styles():
                 padding: 10px 12px;
             }
             [data-testid="stSidebar"] [role="radiogroup"] label:hover {
-                background: #fff7ed;
+                background: #ffedd5;
             }
             [data-testid="stSidebar"] [role="radiogroup"] label[aria-checked="true"] {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: #c2410c;
+                background: #ffedd5;
+                border-color: #f97316;
+                color: #000000;
                 font-weight: 700;
             }
             [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {
                 display: none !important;
             }
             .nav-footer {
-                background: #fff7ed;
-                border: 1px solid #fed7aa;
+                background: #ffedd5;
+                border: 1px solid #f97316;
                 border-radius: 12px;
-                color: #9a3412;
+                color: #000000;
                 font-size: 0.78rem;
                 line-height: 1.5;
                 margin-top: 18px;
                 padding: 14px;
+            }
+            [data-testid="stButton"] button,
+            [data-testid="stButton"] button[kind="secondary"],
+            [data-testid="stFormSubmitButton"] button {
+                background: #ffedd5 !important;
+                border: 1px solid #f97316 !important;
+                border-radius: 10px !important;
+                color: #000000 !important;
+                font-weight: 600 !important;
+            }
+            [data-testid="stButton"] button:hover,
+            [data-testid="stFormSubmitButton"] button:hover {
+                background: #fed7aa !important;
+                border-color: #f97316 !important;
+                color: #000000 !important;
+            }
+            [data-testid="stButton"] button[kind="primary"] {
+                background: #f97316 !important;
+                border-color: #f97316 !important;
+                color: #000000 !important;
+            }
+            [data-testid="stButton"] button[kind="primary"]:hover {
+                background: #ea580c !important;
+                border-color: #ea580c !important;
+                color: #000000 !important;
+            }
+            .stAlert {
+                background: #ffedd5 !important;
+                border: 1px solid #f97316 !important;
+                border-radius: 12px !important;
+                color: #000000 !important;
+            }
+            .stAlert [data-testid="stMarkdownContainer"] p,
+            .stAlert [data-testid="stMarkdownContainer"] {
+                color: #000000 !important;
+            }
+            [data-testid="stProgress"] > div > div {
+                background-color: #f97316 !important;
+            }
+            [data-baseweb="slider"] div,
+            div[data-testid="stTickBar"] {
+                color: #000000 !important;
+            }
+            .stMarkdown,
+            .stMarkdown p,
+            .stCaption,
+            .stSubheader,
+            .stHeadingContainer h1,
+            .stHeadingContainer h2,
+            .stHeadingContainer h3,
+            [data-testid="stMarkdownContainer"] {
+                color: #000000 !important;
+            }
+            input,
+            textarea,
+            [data-baseweb="input"] input,
+            [data-baseweb="textarea"] textarea,
+            [data-baseweb="select"] > div {
+                color: #000000 !important;
+                background: #ffffff !important;
+                border-color: #f97316 !important;
+            }
+            input:focus,
+            textarea:focus,
+            [data-baseweb="input"] input:focus,
+            [data-baseweb="textarea"] textarea:focus,
+            [data-baseweb="select"] > div:focus {
+                border-color: #f97316 !important;
+                box-shadow: 0 0 0 1px #f97316 !important;
+            }
+            [data-testid="stDataFrame"] {
+                color: #000000 !important;
             }
             @media (max-width: 800px) {
                 .metric-tile { min-height: auto; padding: 14px; }
@@ -700,13 +772,13 @@ def _avg_score(actions):
 def style_figure(fig):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="#ffffff",
-        font_color="#7c2d12",
+        plot_bgcolor="#ffedd5",
+        font_color="#000000",
         margin=dict(l=10, r=10, t=30, b=30),
         legend=dict(orientation="h", yanchor="bottom", y=-0.25),
     )
     fig.update_xaxes(showgrid=False, zeroline=False)
-    fig.update_yaxes(gridcolor="#ffedd5", gridwidth=1)
+    fig.update_yaxes(gridcolor="#fed7aa", gridwidth=1)
     return fig
 
 
