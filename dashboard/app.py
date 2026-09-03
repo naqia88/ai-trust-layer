@@ -50,12 +50,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Custom CSS ────────────────────────────────────────────────────────────────
+# ── Custom CSS - Complete Redesign ──────────────────────────────────────────
 
 st.markdown("""
 <style>
     /* ===== IMPORTS ===== */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     /* ===== RESET & BASE ===== */
     * {
@@ -69,385 +69,424 @@ st.markdown("""
     }
 
     .stApp {
-        background: #080d1a;
+        background: #f0f4f8;
     }
 
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #0d1526;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #1e3a6e;
-        border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #2e4a7a;
-    }
-
-    /* ===== SIDEBAR ===== */
+    /* ===== SIDEBAR - COMPLETELY REDESIGNED ===== */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #090f1f 0%, #0d1526 100%);
-        border-right: 1px solid rgba(30, 45, 74, 0.6);
-        padding-top: 20px;
-    }
-    
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
-        color: #8aa9d9;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-weight: 700;
-        padding: 0 0 8px 0;
-        border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+        background: #ffffff !important;
+        border-right: none !important;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
+        padding-top: 30px !important;
     }
 
-    /* Sidebar user profile card */
-    .sidebar-profile {
-        background: linear-gradient(135deg, #0d1a33 0%, #13203a 100%);
-        border: 1px solid #1e2d4a;
-        border-radius: 14px;
-        padding: 20px;
+    /* Sidebar Header */
+    .sidebar-header {
+        padding: 0 24px 24px 24px;
+        border-bottom: 1px solid #eef2f6;
         margin-bottom: 24px;
-        text-align: center;
     }
-    .sidebar-profile .avatar {
-        width: 72px;
-        height: 72px;
+    .sidebar-header .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .sidebar-header .logo-icon {
+        font-size: 32px;
+    }
+    .sidebar-header .logo-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a2332;
+        letter-spacing: -0.5px;
+    }
+    .sidebar-header .logo-text span {
+        color: #4f7cff;
+    }
+    .sidebar-header .subtitle {
+        font-size: 12px;
+        color: #8a9bb5;
+        margin-top: 4px;
+        padding-left: 44px;
+    }
+
+    /* Sidebar User Profile */
+    .sidebar-user {
+        padding: 16px 20px;
+        background: #f8faff;
+        border-radius: 12px;
+        margin: 0 16px 20px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid #eef2f6;
+    }
+    .sidebar-user .avatar {
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #1e3a6e, #2e4a7a);
+        background: linear-gradient(135deg, #4f7cff, #6c5ce7);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 12px;
-        font-size: 28px;
+        color: white;
         font-weight: 700;
-        color: #e8f0fe;
-        border: 2px solid #2e4a7a;
-        box-shadow: 0 4px 20px rgba(30, 58, 110, 0.4);
+        font-size: 16px;
+        flex-shrink: 0;
     }
-    .sidebar-profile .name {
-        color: #e8f0fe;
-        font-weight: 700;
-        font-size: 1rem;
-        margin: 0;
+    .sidebar-user .user-info .name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a2332;
     }
-    .sidebar-profile .email {
-        color: #7a9cc4;
-        font-size: 0.78rem;
-        margin: 2px 0 0 0;
+    .sidebar-user .user-info .role {
+        font-size: 12px;
+        color: #8a9bb5;
     }
 
-    /* Sidebar nav items */
+    /* Sidebar Navigation - Clean & Minimal */
+    .nav-section {
+        padding: 0 16px;
+    }
+    .nav-section .nav-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #8a9bb5;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0 8px 8px 8px;
+    }
     .nav-item {
         display: flex;
         align-items: center;
         gap: 12px;
         padding: 10px 14px;
         border-radius: 10px;
-        color: #7a9cc4;
-        text-decoration: none;
+        color: #4a5a72;
         font-weight: 500;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
+        font-size: 14px;
+        transition: all 0.15s ease;
         cursor: pointer;
         margin: 2px 0;
+        text-decoration: none;
     }
     .nav-item:hover {
-        background: rgba(30, 58, 110, 0.4);
-        color: #e8f0fe;
+        background: #f0f4ff;
+        color: #1a2332;
     }
     .nav-item.active {
-        background: linear-gradient(135deg, #1e3a6e, #1a3370);
-        color: #e8f0fe;
-        border: 1px solid #2e4a7a;
+        background: #4f7cff;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 124, 255, 0.25);
     }
     .nav-item .icon {
-        font-size: 1.2rem;
+        font-size: 18px;
         width: 24px;
         text-align: center;
     }
     .nav-item .badge {
         margin-left: auto;
-        background: #ef4444;
+        background: #ff6b6b;
         color: #fff;
-        font-size: 0.7rem;
-        padding: 1px 8px;
+        font-size: 11px;
+        padding: 1px 10px;
         border-radius: 20px;
-        font-weight: 700;
+        font-weight: 600;
+    }
+    .nav-item.active .badge {
+        background: rgba(255, 255, 255, 0.25);
     }
 
-    /* ===== MAIN HEADER ===== */
-    .main-header {
+    /* Sidebar Footer */
+    .sidebar-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px 24px;
+        border-top: 1px solid #eef2f6;
+        font-size: 12px;
+        color: #8a9bb5;
+        text-align: center;
+    }
+
+    /* ===== MAIN CONTENT - CLEAN & MINIMAL ===== */
+    .main-container {
+        padding: 0 10px;
+    }
+
+    /* Header */
+    .page-header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        padding: 16px 0 24px 0;
-        border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+        align-items: center;
+        padding: 20px 0 24px 0;
+        border-bottom: 1px solid #eef2f6;
         margin-bottom: 28px;
     }
-    .main-header .brand {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-    .main-header .brand .logo {
-        font-size: 2.4rem;
-        line-height: 1;
-    }
-    .main-header .brand h1 {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #e8f0fe;
+    .page-header .header-left h1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #1a2332;
         margin: 0;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #e8f0fe 60%, #7a9cc4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
     }
-    .main-header .brand .subtitle {
-        font-size: 0.78rem;
-        color: #7a9cc4;
-        font-weight: 400;
-        -webkit-text-fill-color: #7a9cc4;
+    .page-header .header-left .breadcrumb {
+        font-size: 13px;
+        color: #8a9bb5;
+        margin-top: 4px;
     }
-    .main-header .header-actions {
+    .page-header .header-left .breadcrumb span {
+        color: #4f7cff;
+    }
+    .page-header .header-right {
         display: flex;
         align-items: center;
         gap: 16px;
     }
-    .header-actions .status-dot {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
+    .header-right .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #e8f5e9;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #2e7d32;
+    }
+    .header-right .status-badge .dot {
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: #22c55e;
-        margin-right: 6px;
         animation: pulse 2s infinite;
     }
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.4; }
     }
-    .header-actions .status-text {
-        color: #7a9cc4;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
 
-    /* ===== STAT CARDS ===== */
+    /* ===== METRIC CARDS - CLEAN MINIMAL ===== */
     [data-testid="metric-container"] {
-        background: linear-gradient(145deg, #0d1a33, #111d38) !important;
-        border: 1px solid #1e2d4a !important;
-        border-radius: 14px !important;
-        padding: 16px 18px !important;
-        transition: all 0.25s ease !important;
+        background: #ffffff !important;
+        border: 1px solid #eef2f6 !important;
+        border-radius: 12px !important;
+        padding: 18px 20px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
     }
     [data-testid="metric-container"]:hover {
-        border-color: #2e4a7a !important;
+        border-color: #d0d9e6 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
         transform: translateY(-2px);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
     }
     [data-testid="metric-container"] label {
-        color: #7a9cc4 !important;
-        font-size: 0.68rem !important;
+        color: #8a9bb5 !important;
+        font-size: 12px !important;
         font-weight: 600 !important;
-        letter-spacing: 0.08em;
         text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
     }
     [data-testid="metric-container"] [data-testid="stMetricValue"] {
-        color: #e8f0fe !important;
-        font-size: 1.6rem !important;
-        font-weight: 800 !important;
+        color: #1a2332 !important;
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.5px !important;
     }
     [data-testid="metric-container"] [data-testid="stMetricDelta"] {
-        color: #7a9cc4 !important;
-        font-size: 0.78rem !important;
+        color: #8a9bb5 !important;
+        font-size: 13px !important;
     }
 
-    /* ===== TABS ===== */
+    /* ===== TABS - CLEAN MINIMAL ===== */
     .stTabs [data-baseweb="tab-list"] {
-        background: #0d1526;
+        background: #ffffff;
         border-radius: 12px;
         padding: 4px;
         gap: 4px;
-        border: 1px solid #1e2d4a;
-        margin-bottom: 20px;
+        border: 1px solid #eef2f6;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
     .stTabs [data-baseweb="tab"] {
-        border-radius: 9px;
-        color: #7a9cc4;
+        border-radius: 8px;
+        color: #4a5a72;
         font-weight: 500;
-        font-size: 0.85rem;
-        padding: 8px 22px;
-        transition: all 0.2s;
+        font-size: 14px;
+        padding: 8px 24px;
+        transition: all 0.15s;
     }
     .stTabs [data-baseweb="tab"]:hover {
-        color: #e8f0fe;
-        background: rgba(30, 58, 110, 0.2);
+        color: #1a2332;
+        background: #f0f4ff;
     }
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #1e3a6e, #1a3370) !important;
-        color: #e8f0fe !important;
-        box-shadow: 0 2px 12px rgba(30, 58, 110, 0.3);
+        background: #4f7cff !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(79, 124, 255, 0.25);
     }
 
-    /* ===== EXPANDER ===== */
+    /* ===== EXPANDER - CLEAN MINIMAL ===== */
     .streamlit-expanderHeader {
-        background: linear-gradient(145deg, #0d1a33, #111d38) !important;
-        border: 1px solid #1e2d4a !important;
+        background: #ffffff !important;
+        border: 1px solid #eef2f6 !important;
         border-radius: 10px !important;
-        color: #c8d8f0 !important;
+        color: #1a2332 !important;
         font-weight: 500 !important;
         padding: 12px 16px !important;
-        transition: all 0.2s;
+        transition: all 0.15s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
     }
     .streamlit-expanderHeader:hover {
-        border-color: #2e4a7a !important;
+        border-color: #d0d9e6 !important;
+        background: #fafcff !important;
     }
     .streamlit-expanderContent {
-        background: #0a1528 !important;
-        border: 1px solid #1e2d4a !important;
+        background: #ffffff !important;
+        border: 1px solid #eef2f6 !important;
         border-top: none !important;
         border-radius: 0 0 10px 10px !important;
         padding: 16px !important;
     }
 
-    /* ===== BUTTONS ===== */
+    /* ===== BUTTONS - CLEAN MINIMAL ===== */
     .stButton > button {
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        font-size: 0.85rem !important;
-        transition: all 0.25s !important;
-        border: 1px solid #1e2d4a !important;
-        background: linear-gradient(145deg, #112040, #0d1a33) !important;
-        color: #c8d8f0 !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+        transition: all 0.15s !important;
+        border: 1px solid #d0d9e6 !important;
+        background: #ffffff !important;
+        color: #1a2332 !important;
         padding: 8px 20px !important;
         height: auto !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
     }
     .stButton > button:hover {
-        background: linear-gradient(135deg, #1e3a6e, #1a3370) !important;
-        border-color: #2e4a7a !important;
-        color: #ffffff !important;
+        background: #f0f4ff !important;
+        border-color: #4f7cff !important;
+        color: #4f7cff !important;
+        box-shadow: 0 2px 8px rgba(79, 124, 255, 0.1) !important;
         transform: translateY(-1px);
-        box-shadow: 0 4px 20px rgba(30, 58, 110, 0.3);
     }
     .stButton > button:active {
         transform: translateY(0px);
     }
 
-    /* ===== FORM INPUTS ===== */
+    /* Primary button variant */
+    .stButton > button[kind="primary"] {
+        background: #4f7cff !important;
+        border-color: #4f7cff !important;
+        color: #ffffff !important;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: #3d6beb !important;
+        border-color: #3d6beb !important;
+        box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3) !important;
+    }
+
+    /* ===== FORM INPUTS - CLEAN MINIMAL ===== */
     .stTextInput input, .stTextArea textarea, .stNumberInput input {
-        background: #0d1a33 !important;
-        border: 1px solid #1e2d4a !important;
-        border-radius: 10px !important;
-        color: #e8f0fe !important;
+        background: #ffffff !important;
+        border: 1px solid #d0d9e6 !important;
+        border-radius: 8px !important;
+        color: #1a2332 !important;
         padding: 10px 14px !important;
-        font-size: 0.9rem !important;
-        transition: border-color 0.2s;
+        font-size: 14px !important;
+        transition: all 0.15s;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
     }
     .stTextInput input:focus, .stTextArea textarea:focus, .stNumberInput input:focus {
-        border-color: #2e4a7a !important;
-        box-shadow: 0 0 0 3px rgba(30, 58, 110, 0.15);
+        border-color: #4f7cff !important;
+        box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.08) !important;
     }
     .stTextInput input::placeholder, .stTextArea textarea::placeholder {
-        color: #4a6a8a !important;
+        color: #b0c0d0 !important;
     }
     .stSelectbox > div > div {
-        background: #0d1a33 !important;
-        border: 1px solid #1e2d4a !important;
-        border-radius: 10px !important;
-        color: #e8f0fe !important;
+        background: #ffffff !important;
+        border: 1px solid #d0d9e6 !important;
+        border-radius: 8px !important;
+        color: #1a2332 !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
     }
     .stSelectbox > div > div:hover {
-        border-color: #2e4a7a !important;
+        border-color: #4f7cff !important;
     }
 
-    /* ===== DATAFRAME ===== */
+    /* ===== DATAFRAME - CLEAN MINIMAL ===== */
     .stDataFrame {
-        border: 1px solid #1e2d4a;
+        border: 1px solid #eef2f6;
         border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
     .stDataFrame [data-testid="stDataFrame"] {
-        background: #0a1528;
+        background: #ffffff;
     }
     .stDataFrame thead tr th {
-        background: #0d1a33 !important;
-        color: #7a9cc4 !important;
+        background: #f8faff !important;
+        color: #4a5a72 !important;
         font-weight: 600 !important;
-        font-size: 0.75rem !important;
+        font-size: 12px !important;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 10px 12px !important;
-        border-bottom: 1px solid #1e2d4a !important;
+        letter-spacing: 0.5px;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #eef2f6 !important;
     }
     .stDataFrame tbody tr td {
-        color: #c8d8f0 !important;
-        padding: 8px 12px !important;
-        border-bottom: 1px solid rgba(30, 45, 74, 0.3) !important;
+        color: #1a2332 !important;
+        padding: 10px 16px !important;
+        border-bottom: 1px solid #f0f4f8 !important;
+        font-size: 14px;
     }
     .stDataFrame tbody tr:hover td {
-        background: rgba(30, 58, 110, 0.15) !important;
+        background: #f8faff !important;
     }
 
-    /* ===== ALERTS ===== */
+    /* ===== ALERTS - CLEAN MINIMAL ===== */
     .stAlert {
         border-radius: 10px !important;
         border: none !important;
         padding: 14px 18px !important;
-    }
-    .stAlert > div {
-        color: #e8f0fe !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
     }
     .stAlert.info {
-        background: rgba(30, 58, 110, 0.25) !important;
-        border-left: 3px solid #2e4a7a !important;
+        background: #eef4ff !important;
+        border-left: 3px solid #4f7cff !important;
     }
     .stAlert.success {
-        background: rgba(34, 197, 94, 0.12) !important;
+        background: #e8f5e9 !important;
         border-left: 3px solid #22c55e !important;
     }
     .stAlert.warning {
-        background: rgba(245, 158, 11, 0.12) !important;
+        background: #fff8e1 !important;
         border-left: 3px solid #f59e0b !important;
     }
     .stAlert.error {
-        background: rgba(239, 68, 68, 0.12) !important;
+        background: #fce4ec !important;
         border-left: 3px solid #ef4444 !important;
     }
 
-    /* ===== BAND PILLS ===== */
+    /* ===== BAND PILLS - CLEAN MINIMAL ===== */
     .band-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 14px;
         border-radius: 20px;
-        font-size: 0.72rem;
+        font-size: 12px;
         font-weight: 600;
-        margin-right: 6px;
-        margin-bottom: 6px;
-        border: 1px solid transparent;
-        letter-spacing: 0.02em;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eef2f6;
+        background: #ffffff;
     }
 
-    /* ===== RISK BADGE ===== */
-    .risk-badge {
-        display: inline-block;
-        padding: 3px 12px;
-        border-radius: 20px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.03em;
-    }
-
-    /* ===== SCORE BAR ===== */
+    /* ===== SCORE BAR - CLEAN MINIMAL ===== */
     .score-bar-wrap {
-        background: #0d1a33;
+        background: #f0f4f8;
         border-radius: 999px;
         height: 6px;
         width: 100%;
@@ -459,25 +498,48 @@ st.markdown("""
         transition: width 0.6s ease;
     }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-        .main-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        .stTabs [data-baseweb="tab"] {
-            padding: 6px 14px;
-            font-size: 0.78rem;
-        }
-    }
-
     /* ===== DIVIDER ===== */
     .divider {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #1e2d4a, transparent);
-        margin: 20px 0;
+        background: #eef2f6;
+        margin: 24px 0;
+    }
+
+    /* ===== SECTION TITLES ===== */
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a2332;
+        margin: 16px 0 12px 0;
+        letter-spacing: -0.3px;
+    }
+    .section-subtitle {
+        font-size: 14px;
+        color: #8a9bb5;
+        margin-bottom: 16px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .page-header .header-left h1 {
+            font-size: 22px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+        [data-testid="metric-container"] [data-testid="stMetricValue"] {
+            font-size: 22px !important;
+        }
+        .sidebar-header .logo-text {
+            font-size: 18px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -546,11 +608,11 @@ def render_score_bar(score, label=""):
     color = score_color(score)
     st.markdown(f"""
         <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
-          <span style="color:#7a9cc4;font-size:0.75rem;font-weight:500;width:72px;flex-shrink:0;">{label}</span>
+          <span style="color:#4a5a72;font-size:13px;font-weight:500;width:80px;flex-shrink:0;">{label}</span>
           <div class="score-bar-wrap" style="flex:1;">
             <div class="score-bar-fill" style="width:{score}%;background:{color};"></div>
           </div>
-          <span style="color:#e8f0fe;font-size:0.78rem;font-weight:700;width:28px;text-align:right;flex-shrink:0;">{score}</span>
+          <span style="color:#1a2332;font-size:14px;font-weight:600;width:32px;text-align:right;flex-shrink:0;">{score}</span>
         </div>
     """, unsafe_allow_html=True)
 
@@ -562,13 +624,14 @@ def show_decision_result(result):
     label = decision.replace("_", " ").title()
 
     st.markdown(f"""
-        <div style="background:linear-gradient(145deg,#0d1a33,#111d38);border:1px solid {color}44;
-                    border-left:4px solid {color};border-radius:12px;padding:16px 20px;margin:12px 0;">
+        <div style="background:#ffffff;border:1px solid #eef2f6;
+                    border-left:4px solid {color};border-radius:10px;padding:16px 20px;margin:12px 0;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.02);">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-            <span style="font-size:1.6rem;">{icon}</span>
-            <span style="color:{color};font-size:1.1rem;font-weight:700;">{label}</span>
-            <span style="color:#7a9cc4;font-size:0.85rem;margin-left:auto;">
-              Final score: <b style="color:#e8f0fe;font-size:1rem;">{result['final_score']}</b>
+            <span style="font-size:24px;">{icon}</span>
+            <span style="color:{color};font-size:18px;font-weight:700;">{label}</span>
+            <span style="color:#8a9bb5;font-size:14px;margin-left:auto;">
+              Final score: <b style="color:#1a2332;font-size:16px;">{result['final_score']}</b>
             </span>
           </div>
         </div>
@@ -577,7 +640,7 @@ def show_decision_result(result):
     if result["reasons"]:
         st.markdown("<div style='margin-top:6px;'>", unsafe_allow_html=True)
         for reason in result["reasons"]:
-            st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {reason}</span><br>", unsafe_allow_html=True)
+            st.markdown(f"<span style='color:#f59e0b;font-size:14px;'>⚡ {reason}</span><br>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -589,49 +652,73 @@ def submit_action(action):
 
 init_db()
 
-# ── SIDEBAR ───────────────────────────────────────────────────────────────────
+# ── SIDEBAR - COMPLETELY REDESIGNED ────────────────────────────────────────
 
 with st.sidebar:
-    # Profile Card
+    # Sidebar Header
     st.markdown("""
-        <div class="sidebar-profile">
-            <div class="avatar">👨‍💻</div>
-            <p class="name">Admin User</p>
-            <p class="email">admin@company.com</p>
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">🛡️</span>
+                <span class="logo-text">Trust<span>Layer</span></span>
+            </div>
+            <div class="subtitle">AI Action Governance</div>
         </div>
     """, unsafe_allow_html=True)
-
-    # Navigation
-    st.markdown("### Navigation")
     
-    nav_items = [
-        ("📊", "Dashboard", True),
-        ("📋", "Audit Log", False),
-        ("🔺", "Review Queue", False),
-        ("🧪", "Test Action", False),
-        ("⚙️", "Settings", False),
-    ]
-    
-    for icon, label, active in nav_items:
-        active_class = "active" if active else ""
-        st.markdown(f"""
-            <div class="nav-item {active_class}">
-                <span class="icon">{icon}</span>
-                {label}
+    # User Profile
+    st.markdown("""
+        <div class="sidebar-user">
+            <div class="avatar">JD</div>
+            <div class="user-info">
+                <div class="name">John Doe</div>
+                <div class="role">Admin · johndoe@company.com</div>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
     
+    # Navigation
+    st.markdown("""
+        <div class="nav-section">
+            <div class="nav-label">Main</div>
+            <div class="nav-item active">
+                <span class="icon">📊</span> Dashboard
+            </div>
+            <div class="nav-item">
+                <span class="icon">📋</span> Audit Log
+            </div>
+            <div class="nav-item">
+                <span class="icon">🔺</span> Review Queue
+                <span class="badge">12</span>
+            </div>
+            <div class="nav-item">
+                <span class="icon">🧪</span> Test Action
+            </div>
+        </div>
+        <div style="height:20px;"></div>
+        <div class="nav-section">
+            <div class="nav-label">Settings</div>
+            <div class="nav-item">
+                <span class="icon">⚙️</span> Preferences
+            </div>
+            <div class="nav-item">
+                <span class="icon">👤</span> Profile
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Filters
     st.markdown("---")
-    st.markdown("### 🎛️ Filters")
+    st.markdown("### Filters")
     
     selected_decisions = st.multiselect(
-        "Decision status",
+        "Decision Status",
         DECISIONS,
         default=DECISIONS,
         format_func=lambda d: f"{DECISION_ICONS[d]}  {d.replace('_', ' ').title()}",
     )
     selected_action_types = st.multiselect(
-        "Action type",
+        "Action Type",
         ACTION_TYPES,
         default=ACTION_TYPES,
         format_func=lambda t: t.replace("_", " ").title(),
@@ -639,39 +726,17 @@ with st.sidebar:
     
     if st.button("🔄 Refresh", use_container_width=True):
         st.rerun()
-
-# ── MAIN HEADER ──────────────────────────────────────────────────────────────
-
-st.markdown("""
-    <div class="main-header">
-        <div class="brand">
-            <span class="logo">🛡️</span>
-            <div>
-                <h1>AI Trust Layer</h1>
-                <span class="subtitle">Real-time governance for AI actions</span>
-            </div>
+    
+    # Sidebar Footer
+    st.markdown("""
+        <div class="sidebar-footer">
+            Version 2.0 · © 2024 TrustLayer
         </div>
-        <div class="header-actions">
-            <span class="status-text">
-                <span class="status-dot"></span> System Online
-            </span>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# ── Decision Band Pills ──────────────────────────────────────────────────────
+# ── MAIN CONTENT ─────────────────────────────────────────────────────────────
 
-st.markdown(f"""
-    <div style="margin-bottom:20px;display:flex;flex-wrap:wrap;gap:4px;">
-        <span class="band-pill" style="background:#22c55e18;color:#22c55e;border-color:#22c55e33;">✅ 0–{AUTO_APPROVE} Approved</span>
-        <span class="band-pill" style="background:#f59e0b18;color:#f59e0b;border-color:#f59e0b33;">⚠️ {AUTO_APPROVE+1}–{FLAG_FOR_REVIEW} Warning</span>
-        <span class="band-pill" style="background:#f9731618;color:#f97316;border-color:#f9731633;">🔺 {FLAG_FOR_REVIEW+1}–{AUTO_BLOCK-1} Escalated</span>
-        <span class="band-pill" style="background:#ef444418;color:#ef4444;border-color:#ef444433;">🚫 {AUTO_BLOCK}–100 Blocked</span>
-    </div>
-""", unsafe_allow_html=True)
-
-# ── Data ──────────────────────────────────────────────────────────────────────
-
+# Data loading
 all_actions = load_actions()
 filtered_actions = filter_actions(all_actions, selected_decisions, selected_action_types)
 decision_counts = count_decisions(all_actions)
@@ -680,27 +745,54 @@ average_score = (
     sum(a["final_score"] for a in all_actions) / len(all_actions) if all_actions else 0
 )
 
-# ── Metrics Row ──────────────────────────────────────────────────────────────
+# ── PAGE HEADER ─────────────────────────────────────────────────────────────
+
+st.markdown(f"""
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Dashboard</h1>
+            <div class="breadcrumb">Home / <span>Overview</span></div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge">
+                <span class="dot"></span> System Online
+            </div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# ── DECISION BANDS ───────────────────────────────────────────────────────────
+
+st.markdown(f"""
+    <div style="margin-bottom:24px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span class="band-pill" style="border-color:#22c55e;color:#22c55e;">✅ 0–{AUTO_APPROVE} Approved</span>
+        <span class="band-pill" style="border-color:#f59e0b;color:#f59e0b;">⚠️ {AUTO_APPROVE+1}–{FLAG_FOR_REVIEW} Warning</span>
+        <span class="band-pill" style="border-color:#f97316;color:#f97316;">🔺 {FLAG_FOR_REVIEW+1}–{AUTO_BLOCK-1} Escalated</span>
+        <span class="band-pill" style="border-color:#ef4444;color:#ef4444;">🚫 {AUTO_BLOCK}–100 Blocked</span>
+    </div>
+""", unsafe_allow_html=True)
+
+# ── METRICS ROW ──────────────────────────────────────────────────────────────
 
 c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
 with c1:
-    st.metric("Total Actions", len(all_actions))
+    st.metric("Total Actions", len(all_actions), delta=None)
 with c2:
     st.metric("Open Escalations", len(open_escalations))
 with c3:
     st.metric("Avg Risk Score", f"{average_score:.1f}")
 with c4:
-    st.metric("✅ Approved", decision_counts["approved"])
+    st.metric("Approved", decision_counts["approved"])
 with c5:
-    st.metric("⚠️ Warnings", decision_counts["approved_with_warning"])
+    st.metric("Warnings", decision_counts["approved_with_warning"])
 with c6:
-    st.metric("🔺 Escalated", decision_counts["escalated"])
+    st.metric("Escalated", decision_counts["escalated"])
 with c7:
-    st.metric("🚫 Blocked", decision_counts["blocked"])
+    st.metric("Blocked", decision_counts["blocked"])
 
 st.markdown("<hr class='divider'>", unsafe_allow_html=True)
 
-# ── Charts Row ────────────────────────────────────────────────────────────────
+# ── CHARTS ROW ────────────────────────────────────────────────────────────────
 
 if all_actions:
     chart_col1, chart_col2 = st.columns([1, 2])
@@ -713,22 +805,22 @@ if all_actions:
         fig_donut = go.Figure(go.Pie(
             labels=labels,
             values=values,
-            hole=0.68,
-            marker=dict(colors=colors, line=dict(color="#080d1a", width=3)),
+            hole=0.65,
+            marker=dict(colors=colors, line=dict(color="#ffffff", width=2)),
             textinfo="none",
             hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Share: %{percent}<extra></extra>",
         ))
         fig_donut.add_annotation(
-            text=f"<b>{len(all_actions)}</b><br><span style='font-size:9px;color:#7a9cc4;'>actions</span>",
+            text=f"<b>{len(all_actions)}</b><br><span style='font-size:11px;color:#8a9bb5;'>actions</span>",
             x=0.5, y=0.5, showarrow=False,
-            font=dict(size=20, color="#e8f0fe", family="Inter"),
+            font=dict(size=22, color="#1a2332", family="Inter"),
         )
         fig_donut.update_layout(
-            title=dict(text="Decision Breakdown", font=dict(color="#c8d8f0", size=14, weight=600)),
+            title=dict(text="Decision Breakdown", font=dict(color="#1a2332", size=16, weight=600)),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#7a9cc4", family="Inter"),
-            legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)", orientation="h", yanchor="bottom", y=-0.15),
+            font=dict(color="#4a5a72", family="Inter"),
+            legend=dict(font=dict(color="#4a5a72"), bgcolor="rgba(0,0,0,0)", orientation="h", yanchor="bottom", y=-0.12),
             margin=dict(t=40, b=30, l=10, r=10),
             height=300,
         )
@@ -749,11 +841,11 @@ if all_actions:
             fig_bar.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#7a9cc4", family="Inter"),
-                title=dict(font=dict(color="#c8d8f0", size=14, weight=600)),
-                legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)"),
-                xaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0")),
-                yaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0"), range=[0, 100]),
+                font=dict(color="#4a5a72", family="Inter"),
+                title=dict(font=dict(color="#1a2332", size=16, weight=600)),
+                legend=dict(font=dict(color="#4a5a72"), bgcolor="rgba(0,0,0,0)"),
+                xaxis=dict(gridcolor="#eef2f6", tickfont=dict(color="#4a5a72")),
+                yaxis=dict(gridcolor="#eef2f6", tickfont=dict(color="#4a5a72"), range=[0, 100]),
                 margin=dict(t=40, b=10, l=10, r=10),
                 height=300,
             )
@@ -761,7 +853,7 @@ if all_actions:
 
 st.markdown("<hr class='divider'>", unsafe_allow_html=True)
 
-# ── Tabs ──────────────────────────────────────────────────────────────────────
+# ── TABS ──────────────────────────────────────────────────────────────────────
 
 audit_tab, review_tab, submit_tab = st.tabs([
     "📋 Audit Log",
@@ -801,56 +893,4 @@ with audit_tab:
                     min_value=0,
                     max_value=100,
                     format="%d",
-                ),
-                "Financial": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "Privacy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-                "Policy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
-            },
-        )
-
-        st.markdown(f"<p style='color:#7a9cc4;font-size:0.82rem;margin-top:6px;'>"
-                    f"Showing {len(filtered_actions)} of {len(all_actions)} actions</p>",
-                    unsafe_allow_html=True)
-
-        st.markdown("### Action details")
-        for action in filtered_actions:
-            dec = action["decision"]
-            color = DECISION_COLORS[dec]
-            with st.expander(
-                f"{DECISION_ICONS[dec]}  Action {action['id']}  ·  "
-                f"{action['action_type'].replace('_', ' ').title()}  ·  "
-                f"Score {action['final_score']}"
-            ):
-                left, right = st.columns([1, 1])
-                with left:
-                    st.markdown("**Score breakdown**")
-                    render_score_bar(action["financial_score"], "Financial")
-                    render_score_bar(action["privacy_score"], "Privacy")
-                    render_score_bar(action["policy_score"], "Policy")
-                    render_score_bar(action["final_score"], "Final")
-                with right:
-                    st.markdown("**Action details**")
-                    st.json(action["details"])
-
-                if action["reasons"]:
-                    st.markdown("**Risk reasons**")
-                    for r in action["reasons"]:
-                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
-                                    unsafe_allow_html=True)
-
-                if action["resolved_by"]:
-                    st.markdown(
-                        f"<div style='margin-top:10px;padding:10px;background:#0d1a33;"
-                        f"border-radius:8px;border:1px solid #1e2d4a;'>"
-                        f"<span style='color:#7a9cc4;font-size:0.82rem;'>"
-                        f"Resolved by <b style='color:#c8d8f0;'>{action['resolved_by']}</b> · "
-                        f"{action['resolution']} · {action['resolution_time']}"
-                        f"</span></div>",
-                        unsafe_allow_html=True,
-                    )
-
-# ── Review Queue ──────────────────────────────────────────────────────────────
-
-with review_tab:
-    if "review_message" in st.session_state:
-        st.success
+               
