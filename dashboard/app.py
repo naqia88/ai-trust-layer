@@ -2,6 +2,11 @@ import html
 import json
 import os
 import sys
+from datetime import datetime, timedelta
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
@@ -23,15 +28,32 @@ from worker.agent import (
 
 DECISIONS = ["approved", "approved_with_warning", "escalated", "blocked"]
 ACTION_TYPES = ["transfer_money", "send_email", "execute_code"]
+NAV_ITEMS = ["Overview", "Review Queue", "Audit History", "Test Action"]
 DECISION_META = {
-    "approved": {"label": "Approved", "risk": "Low risk", "tone": "approved"},
+    "approved": {
+        "label": "Approved",
+        "risk": "Low risk",
+        "tone": "approved",
+        "color": "#10b981",
+    },
     "approved_with_warning": {
         "label": "Approved with warning",
         "risk": "Moderate risk",
         "tone": "warning",
+        "color": "#f59e0b",
     },
-    "escalated": {"label": "Escalated", "risk": "High risk", "tone": "escalated"},
-    "blocked": {"label": "Blocked", "risk": "Critical risk", "tone": "blocked"},
+    "escalated": {
+        "label": "Escalated",
+        "risk": "High risk",
+        "tone": "escalated",
+        "color": "#ef4444",
+    },
+    "blocked": {
+        "label": "Blocked",
+        "risk": "Critical risk",
+        "tone": "blocked",
+        "color": "#9a3412",
+    },
 }
 ACTION_LABELS = {
     "transfer_money": "Money transfer",
@@ -128,7 +150,12 @@ def build_sample_action(sample_name):
 def decision_meta(decision):
     return DECISION_META.get(
         decision,
-        {"label": decision.replace("_", " ").title(), "risk": "Unknown", "tone": "warning"},
+        {
+            "label": decision.replace("_", " ").title(),
+            "risk": "Unknown",
+            "tone": "warning",
+            "color": "#f59e0b",
+        },
     )
 
 
@@ -174,82 +201,99 @@ def render_styles():
         """
         <style>
             .stApp {
-                background: #faf8fb;
-                color: #2e1065;
-            }
-            .dashboard-header {
-                background: #ffffff;
-                border: 1px solid #e9d5ff;
-                border-radius: 16px;
-                box-shadow: 0 1px 3px rgba(107, 33, 168, 0.06);
-                color: #2e1065;
-                display: flex;
-                justify-content: space-between;
-                gap: 24px;
-                margin: 0 0 28px;
-                padding: 26px 28px;
-            }
-            .dashboard-header h1 {
-                color: #4c1d95;
-                font-size: 1.75rem;
-                font-weight: 700;
-                margin: 4px 0 8px;
-            }
-            .dashboard-header p {
-                color: #6b21a8;
-                margin: 0;
+                background: #fff7ed;
+                color: #1c1917;
             }
             .eyebrow {
-                color: #7c3aed;
+                color: #f97316;
                 font-size: 0.7rem;
                 font-weight: 700;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
             }
-            .header-rule {
-                align-self: center;
-                background: #f5f3ff;
-                border: 1px solid #e9d5ff;
-                border-radius: 12px;
-                color: #5b21b6;
-                font-size: 0.8rem;
-                line-height: 1.55;
-                max-width: 340px;
-                padding: 14px 16px;
+            .topbar-title h1 {
+                color: #c2410c;
+                font-size: 1.6rem;
+                font-weight: 700;
+                margin: 4px 0 0;
             }
-            .metric-card {
+            .avatar {
+                align-items: center;
+                background: #ffedd5;
+                border: 2px solid #fed7aa;
+                border-radius: 999px;
+                color: #c2410c;
+                display: flex;
+                font-size: 1.2rem;
+                font-weight: 700;
+                height: 44px;
+                justify-content: center;
+                margin-left: auto;
+                width: 44px;
+            }
+            .metric-tile {
+                align-items: center;
                 background: #ffffff;
-                border: 1px solid #e9d5ff;
-                border-left: 4px solid #c4b5fd;
-                border-radius: 12px;
-                box-shadow: 0 1px 3px rgba(107, 33, 168, 0.06);
-                min-height: 120px;
-                padding: 20px;
+                border: 1px solid #fed7aa;
+                border-radius: 16px;
+                box-shadow: 0 1px 3px rgba(249, 115, 22, 0.06);
+                display: flex;
+                gap: 16px;
+                min-height: 110px;
+                padding: 18px;
             }
-            .metric-card.approved { border-left-color: #10b981; }
-            .metric-card.warning { border-left-color: #f59e0b; }
-            .metric-card.escalated { border-left-color: #ef4444; }
-            .metric-card.blocked { border-left-color: #7f1d1d; }
-            .metric-card.neutral { border-left-color: #7c3aed; }
+            .icon-box {
+                align-items: center;
+                background: #ffedd5;
+                border-radius: 12px;
+                color: #c2410c;
+                display: flex;
+                flex-shrink: 0;
+                font-size: 1.6rem;
+                height: 56px;
+                justify-content: center;
+                width: 56px;
+            }
+            .icon-box.approved { background: #d1fae5; color: #065f46; }
+            .icon-box.warning { background: #fef3c7; color: #92400e; }
+            .icon-box.escalated { background: #fee2e2; color: #b42318; }
+            .icon-box.blocked { background: #ffedd5; color: #9a3412; }
+            .metric-content { flex: 1; }
             .metric-label {
-                color: #7c3aed;
+                color: #9a3412;
                 font-size: 0.75rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
-                margin: 0;
                 text-transform: uppercase;
             }
             .metric-value {
-                color: #4c1d95;
-                font-size: 1.9rem;
+                color: #7c2d12;
+                font-size: 1.8rem;
                 font-weight: 700;
-                line-height: 1.25;
-                margin: 10px 0 5px;
+                line-height: 1.2;
+                margin: 4px 0 2px;
             }
-            .metric-detail {
-                color: #6b21a8;
-                font-size: 0.85rem;
-                margin: 0;
+            .metric-delta {
+                color: #ea580c;
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+            .section-title {
+                color: #7c2d12;
+                font-size: 1.15rem;
+                font-weight: 700;
+                margin: 22px 0 14px;
+            }
+            .chart-card-title {
+                color: #7c2d12;
+                font-size: 1rem;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+            .chart-card-subtitle {
+                color: #9a3412;
+                font-size: 0.8rem;
+                margin-bottom: 14px;
             }
             .decision-badge {
                 border-radius: 999px;
@@ -262,9 +306,9 @@ def render_styles():
             .decision-badge.approved { background: #d1fae5; color: #065f46; }
             .decision-badge.warning { background: #fef3c7; color: #92400e; }
             .decision-badge.escalated { background: #fee2e2; color: #b42318; }
-            .decision-badge.blocked { background: #f3e8ff; color: #6b21a8; }
+            .decision-badge.blocked { background: #ffedd5; color: #9a3412; }
             .action-stripe {
-                background: #c4b5fd;
+                background: #fdba74;
                 border-radius: 10px 10px 0 0;
                 height: 3px;
                 margin-bottom: -3px;
@@ -274,9 +318,9 @@ def render_styles():
             .action-stripe.approved { background: #10b981; }
             .action-stripe.warning { background: #f59e0b; }
             .action-stripe.escalated { background: #ef4444; }
-            .action-stripe.blocked { background: #7f1d1d; }
+            .action-stripe.blocked { background: #9a3412; }
             .reason-heading {
-                color: #7c3aed;
+                color: #9a3412;
                 font-size: 0.72rem;
                 font-weight: 600;
                 letter-spacing: 0.04em;
@@ -284,9 +328,9 @@ def render_styles():
                 text-transform: uppercase;
             }
             .reason-chip {
-                background: #f3e8ff;
+                background: #ffedd5;
                 border-radius: 999px;
-                color: #5b21b6;
+                color: #9a3412;
                 display: inline-block;
                 font-size: 0.78rem;
                 margin: 0 6px 6px 0;
@@ -294,26 +338,92 @@ def render_styles():
             }
             .empty-state {
                 background: #ffffff;
-                border: 1px dashed #d8b4fe;
+                border: 1px dashed #fdba74;
                 border-radius: 12px;
-                color: #6b21a8;
+                color: #9a3412;
                 padding: 32px;
                 text-align: center;
             }
+            [data-testid="stVerticalBlockBorderWrapper"] {
+                background: #ffffff !important;
+                border: 1px solid #fed7aa !important;
+                border-radius: 12px !important;
+            }
             [data-testid="stSidebar"] {
                 background: #ffffff;
-                border-right: 1px solid #e9d5ff;
+                border-right: 1px solid #fed7aa;
             }
-            [data-testid="stTabs"] button {
-                color: #5b21b6;
+            .nav-brand {
+                align-items: center;
+                display: flex;
+                gap: 12px;
+                margin: 18px 4px 22px;
+            }
+            .nav-logo {
+                align-items: center;
+                background: #fff7ed;
+                border: 1px solid #fed7aa;
+                border-radius: 10px;
+                color: #f97316;
+                display: flex;
+                font-size: 1.4rem;
+                height: 42px;
+                justify-content: center;
+                width: 42px;
+            }
+            .nav-title {
+                color: #7c2d12;
+                font-size: 1.05rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+            .nav-subtitle {
+                color: #9a3412;
+                font-size: 0.75rem;
+            }
+            .filter-heading {
+                color: #7c2d12;
+                font-size: 0.8rem;
                 font-weight: 600;
+                margin-bottom: 10px;
             }
-            [data-testid="stVerticalBlockBorderWrapper"] {
+            [data-testid="stSidebar"] [role="radiogroup"] label {
+                align-items: center;
+                border: 1px solid transparent;
+                border-radius: 10px;
+                color: #57534e;
+                cursor: pointer;
+                display: flex;
+                font-weight: 500;
+                gap: 10px;
+                margin: 4px 0;
+                padding: 10px 12px;
+            }
+            [data-testid="stSidebar"] [role="radiogroup"] label:hover {
+                background: #fff7ed;
+            }
+            [data-testid="stSidebar"] [role="radiogroup"] label[aria-checked="true"] {
+                background: #fff7ed;
+                border-color: #fed7aa;
+                color: #c2410c;
+                font-weight: 700;
+            }
+            [data-testid="stSidebar"] [role="radiogroup"] label > div:first-child {
+                display: none !important;
+            }
+            .nav-footer {
+                background: #fff7ed;
+                border: 1px solid #fed7aa;
                 border-radius: 12px;
+                color: #9a3412;
+                font-size: 0.78rem;
+                line-height: 1.5;
+                margin-top: 18px;
+                padding: 14px;
             }
             @media (max-width: 800px) {
-                .dashboard-header { display: block; padding: 22px; }
-                .header-rule { margin-top: 18px; }
+                .metric-tile { min-height: auto; padding: 14px; }
+                .avatar { margin: 12px 0 0; }
             }
         </style>
         """,
@@ -321,33 +431,86 @@ def render_styles():
     )
 
 
-def render_header():
+def render_topbar():
+    left, center, right = st.columns([4, 3, 1])
+    with left:
+        st.markdown(
+            '<div class="topbar-title"><div class="eyebrow">Risk Operations</div><h1>AI Trust Layer</h1></div>',
+            unsafe_allow_html=True,
+        )
+    with center:
+        st.text_input(
+            "Search actions",
+            placeholder="Search actions...",
+            label_visibility="collapsed",
+            key="search_query",
+        )
+    with right:
+        st.markdown('<div class="avatar">R</div>', unsafe_allow_html=True)
+    return st.session_state.get("search_query", "")
+
+
+def render_sidebar():
     st.markdown(
-        f"""
-        <div class="dashboard-header">
+        """
+        <div class="nav-brand">
+            <div class="nav-logo">🔒</div>
             <div>
-                <div class="eyebrow">Risk Operations</div>
-                <h1>AI Trust Layer</h1>
-                <p>Review trust decisions before actions are carried out.</p>
-            </div>
-            <div class="header-rule">
-                <strong>Decision bands</strong><br>
-                0–{AUTO_APPROVE} approved · {AUTO_APPROVE + 1}–{FLAG_FOR_REVIEW} warning<br>
-                {FLAG_FOR_REVIEW + 1}–{AUTO_BLOCK - 1} escalated · {AUTO_BLOCK}–100 blocked
+                <div class="nav-title">AI Trust Layer</div>
+                <div class="nav-subtitle">Risk Operations</div>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-
-def render_metric_card(label, value, detail, tone="neutral"):
+    st.radio(
+        "Navigation",
+        NAV_ITEMS,
+        label_visibility="collapsed",
+        key="nav",
+    )
+    st.divider()
+    st.markdown('<div class="filter-heading">Review filters</div>', unsafe_allow_html=True)
+    st.multiselect(
+        "Decision status",
+        DECISIONS,
+        default=DECISIONS,
+        format_func=lambda decision: decision_meta(decision)["label"],
+        key="selected_decisions",
+    )
+    st.multiselect(
+        "Action type",
+        ACTION_TYPES,
+        default=ACTION_TYPES,
+        format_func=readable_action_type,
+        key="selected_action_types",
+    )
+    st.divider()
+    if st.button("Refresh data", use_container_width=True):
+        st.rerun()
     st.markdown(
         f"""
-        <div class="metric-card {tone}">
-            <p class="metric-label">{html.escape(str(label))}</p>
-            <p class="metric-value">{html.escape(str(value))}</p>
-            <p class="metric-detail">{html.escape(str(detail))}</p>
+        <div class="nav-footer">
+            <strong>Decision bands</strong><br>
+            0–{AUTO_APPROVE} approved · {AUTO_APPROVE + 1}–{FLAG_FOR_REVIEW} warning<br>
+            {FLAG_FOR_REVIEW + 1}–{AUTO_BLOCK - 1} escalated · {AUTO_BLOCK}–100 blocked
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption("Every action is evaluated and written to the SQLite audit trail.")
+
+
+def render_metric_tile(icon, label, value, delta, tone="neutral"):
+    st.markdown(
+        f"""
+        <div class="metric-tile">
+            <div class="icon-box {tone}">{icon}</div>
+            <div class="metric-content">
+                <div class="metric-label">{html.escape(str(label))}</div>
+                <div class="metric-value">{html.escape(str(value))}</div>
+                <div class="metric-delta">{html.escape(str(delta))}</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -467,102 +630,290 @@ def submit_action(action):
     st.rerun()
 
 
-st.set_page_config(page_title="AI Trust Layer", layout="wide")
-init_db()
-render_styles()
-render_header()
+def actions_dataframe(actions):
+    if not actions:
+        return pd.DataFrame()
+    df = pd.DataFrame(actions)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+    df["decision_label"] = df["decision"].apply(lambda d: decision_meta(d)["label"])
+    df["action_label"] = df["action_type"].apply(readable_action_type)
+    return df
 
-with st.sidebar:
-    st.markdown("## Review filters")
-    st.caption("Control which actions appear in audit history and the command center.")
-    selected_decisions = st.multiselect(
-        "Decision status",
-        DECISIONS,
-        default=DECISIONS,
-        format_func=lambda decision: decision_meta(decision)["label"],
-    )
-    selected_action_types = st.multiselect(
-        "Action type",
-        ACTION_TYPES,
-        default=ACTION_TYPES,
-        format_func=readable_action_type,
-    )
-    st.divider()
-    if st.button("Refresh data", use_container_width=True):
-        st.rerun()
-    st.caption("Every action is evaluated and written to the SQLite audit trail.")
 
-all_actions = load_actions()
-filtered_actions = filter_actions(
-    all_actions,
-    selected_decisions,
-    selected_action_types,
-)
-decision_counts = count_decisions(all_actions)
-open_escalations = get_open_escalations(all_actions)
-average_score = (
-    sum(action["final_score"] for action in all_actions) / len(all_actions)
-    if all_actions
-    else 0
-)
+def search_actions(actions, query):
+    query = query.lower().strip()
+    if not query:
+        return actions
+    filtered = []
+    for action in actions:
+        if query in str(action["id"]).lower():
+            filtered.append(action)
+            continue
+        if query in readable_action_type(action["action_type"]).lower():
+            filtered.append(action)
+            continue
+        if query in action_title(action).lower():
+            filtered.append(action)
+            continue
+        if query in action_summary(action).lower():
+            filtered.append(action)
+            continue
+        if any(query in str(reason).lower() for reason in action.get("reasons", [])):
+            filtered.append(action)
+    return filtered
 
-metric_columns = st.columns(4)
-with metric_columns[0]:
-    render_metric_card("Total actions", len(all_actions), "All recorded trust decisions")
-with metric_columns[1]:
-    render_metric_card(
-        "Needs review",
-        len(open_escalations),
-        "Open escalations awaiting a human",
-        "escalated",
-    )
-with metric_columns[2]:
-    render_metric_card(
-        "Blocked actions",
-        decision_counts["blocked"],
-        "Actions stopped automatically",
-        "blocked",
-    )
-with metric_columns[3]:
-    render_metric_card(
-        "Average risk",
-        f"{average_score:.1f}",
-        "Average final trust score",
-        "warning" if average_score > AUTO_APPROVE else "approved",
-    )
 
-overview_tab, review_tab, audit_tab, submit_tab = st.tabs(
-    ["Overview", "Review queue", "Audit history", "Test an action"]
-)
+def _compute_delta(actions, value_fn):
+    now = datetime.now()
+    current_window = [
+        action
+        for action in actions
+        if action.get("timestamp")
+        and datetime.fromisoformat(action["timestamp"]) >= now - timedelta(days=7)
+    ]
+    previous_window = [
+        action
+        for action in actions
+        if action.get("timestamp")
+        and now - timedelta(days=14)
+        <= datetime.fromisoformat(action["timestamp"])
+        < now - timedelta(days=7)
+    ]
+    current = value_fn(current_window)
+    previous = value_fn(previous_window)
+    diff = current - previous
+    return current, previous, diff
 
-with overview_tab:
-    st.subheader("Risk overview")
-    overview_left, overview_right = st.columns([2, 1])
-    with overview_left:
-        st.write(
-            "Monitor the latest trust decisions and open high-risk actions from one place."
+
+def _format_delta(diff, previous, is_score=False):
+    if previous == 0 and diff == 0:
+        return "No change vs last 7 days"
+    sign = "+" if diff >= 0 else ""
+    unit = " pts" if is_score else ""
+    return f"{sign}{diff:.1f}{unit} vs last 7 days"
+
+
+def _avg_score(actions):
+    return sum(action["final_score"] for action in actions) / len(actions) if actions else 0
+
+
+def style_figure(fig):
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#ffffff",
+        font_color="#7c2d12",
+        margin=dict(l=10, r=10, t=30, b=30),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.25),
+    )
+    fig.update_xaxes(showgrid=False, zeroline=False)
+    fig.update_yaxes(gridcolor="#ffedd5", gridwidth=1)
+    return fig
+
+
+def build_trend_chart(df):
+    if df.empty:
+        fig = go.Figure()
+        fig.add_annotation(text="No data", showarrow=False)
+        return style_figure(fig)
+    df = df.sort_values("timestamp")
+    fig = px.line(
+        df,
+        x="timestamp",
+        y="final_score",
+        markers=True,
+        color_discrete_sequence=["#f97316"],
+    )
+    fig.add_hline(
+        y=AUTO_APPROVE,
+        line_dash="dot",
+        line_color="#10b981",
+        annotation_text="Approve",
+        annotation_position="bottom right",
+    )
+    fig.add_hline(
+        y=FLAG_FOR_REVIEW,
+        line_dash="dot",
+        line_color="#f59e0b",
+        annotation_text="Warning",
+        annotation_position="bottom right",
+    )
+    fig.add_hline(
+        y=AUTO_BLOCK,
+        line_dash="dot",
+        line_color="#ef4444",
+        annotation_text="Block",
+        annotation_position="bottom right",
+    )
+    fig.update_yaxes(range=[0, 100])
+    fig.update_xaxes(title_text=None)
+    fig.update_yaxes(title_text="Trust score")
+    return style_figure(fig)
+
+
+def build_donut_chart(df):
+    if df.empty:
+        fig = go.Figure()
+        fig.add_annotation(text="No data", showarrow=False)
+        return style_figure(fig)
+    counts = df["decision_label"].value_counts().reset_index()
+    counts.columns = ["Decision", "Count"]
+    color_map = {
+        meta["label"]: meta["color"] for meta in DECISION_META.values()
+    }
+    fig = px.pie(
+        counts,
+        values="Count",
+        names="Decision",
+        hole=0.55,
+        color="Decision",
+        color_discrete_map=color_map,
+    )
+    fig.update_traces(textinfo="percent+label", pull=None)
+    return style_figure(fig)
+
+
+def build_breakdown_chart(df):
+    if df.empty:
+        fig = go.Figure()
+        fig.add_annotation(text="No data", showarrow=False)
+        return style_figure(fig)
+    grouped = (
+        df.groupby(["action_label", "decision_label"])
+        .size()
+        .reset_index(name="Count")
+    )
+    color_map = {
+        meta["label"]: meta["color"] for meta in DECISION_META.values()
+    }
+    fig = px.bar(
+        grouped,
+        x="action_label",
+        y="Count",
+        color="decision_label",
+        barmode="stack",
+        color_discrete_map=color_map,
+    )
+    fig.update_xaxes(title_text=None)
+    fig.update_yaxes(title_text=None)
+    return style_figure(fig)
+
+
+def page_overview(actions, open_escalations, decision_counts, average_score):
+    st.markdown('<div class="section-title">Overview</div>', unsafe_allow_html=True)
+
+    _, total_prev, total_diff = _compute_delta(actions, lambda arr: len(arr))
+    _, review_prev, review_diff = _compute_delta(
+        open_escalations, lambda arr: len(arr)
+    )
+    blocked_actions = [
+        action for action in actions if action["decision"] == "blocked"
+    ]
+    _, blocked_prev, blocked_diff = _compute_delta(
+        blocked_actions, lambda arr: len(arr)
+    )
+    _, avg_prev, avg_diff = _compute_delta(actions, _avg_score)
+
+    metric_columns = st.columns(4)
+    with metric_columns[0]:
+        render_metric_tile(
+            "📝",
+            "Total actions",
+            len(actions),
+            _format_delta(total_diff, total_prev),
+            "neutral",
         )
-    with overview_right:
-        if open_escalations:
-            st.warning(f"{len(open_escalations)} action(s) require human review.")
-        else:
-            st.success("No actions currently require human review.")
+    with metric_columns[1]:
+        render_metric_tile(
+            "🚨",
+            "Needs review",
+            len(open_escalations),
+            _format_delta(review_diff, review_prev),
+            "escalated",
+        )
+    with metric_columns[2]:
+        render_metric_tile(
+            "🚫",
+            "Blocked actions",
+            decision_counts["blocked"],
+            _format_delta(blocked_diff, blocked_prev),
+            "blocked",
+        )
+    with metric_columns[3]:
+        render_metric_tile(
+            "⚠️",
+            "Average risk",
+            f"{average_score:.1f}",
+            _format_delta(avg_diff, avg_prev, is_score=True),
+            "warning",
+        )
 
-    st.markdown("### Latest actions")
-    if not filtered_actions:
+    df = actions_dataframe(actions)
+    chart_columns = st.columns([2, 1])
+    with chart_columns[0]:
+        with st.container(border=True):
+            st.markdown(
+                '<div class="chart-card-title">Risk score trend</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="chart-card-subtitle">Final trust score over time</div>',
+                unsafe_allow_html=True,
+            )
+            st.plotly_chart(
+                build_trend_chart(df),
+                use_container_width=True,
+                config={"displayModeBar": False},
+                key="trend_chart",
+            )
+    with chart_columns[1]:
+        with st.container(border=True):
+            st.markdown(
+                '<div class="chart-card-title">Decision distribution</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="chart-card-subtitle">Share of each decision</div>',
+                unsafe_allow_html=True,
+            )
+            st.plotly_chart(
+                build_donut_chart(df),
+                use_container_width=True,
+                config={"displayModeBar": False},
+                key="donut_chart",
+            )
+
+    with st.container(border=True):
+        st.markdown(
+            '<div class="chart-card-title">Decisions by action type</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="chart-card-subtitle">Stacked breakdown across action types</div>',
+            unsafe_allow_html=True,
+        )
+        st.plotly_chart(
+            build_breakdown_chart(df),
+            use_container_width=True,
+            config={"displayModeBar": False},
+            key="breakdown_chart",
+        )
+
+    st.markdown('<div class="section-title">Latest actions</div>', unsafe_allow_html=True)
+    if not actions:
         st.markdown(
             '<div class="empty-state">No audit records match the current filters.</div>',
             unsafe_allow_html=True,
         )
-    else:
-        for index in range(0, min(len(filtered_actions), 6), 2):
-            action_columns = st.columns(2)
-            for column, action in zip(action_columns, filtered_actions[index : index + 2]):
-                with column:
-                    render_action_card(action)
+        return
+    for index in range(0, min(len(actions), 6), 2):
+        action_columns = st.columns(2)
+        for column, action in zip(action_columns, actions[index : index + 2]):
+            with column:
+                render_action_card(action)
 
-with review_tab:
-    st.subheader("Review queue")
+
+def page_review_queue(actions, open_escalations):
+    st.markdown('<div class="section-title">Review queue</div>', unsafe_allow_html=True)
     st.caption("Resolve escalated actions after reviewing their checker scores and risk signals.")
     if "review_message" in st.session_state:
         st.success(st.session_state.pop("review_message"))
@@ -580,45 +931,49 @@ with review_tab:
         for action in open_escalations:
             render_action_card(action, reviewer_name, allow_resolution=True)
 
-    resolved_actions = [action for action in all_actions if action["resolved_by"]]
+    resolved_actions = [action for action in actions if action["resolved_by"]]
     if resolved_actions:
-        st.markdown("### Recently resolved")
+        st.markdown('<div class="section-title">Recently resolved</div>', unsafe_allow_html=True)
         for action in resolved_actions[:3]:
             render_action_card(action)
 
-with audit_tab:
-    st.subheader("Audit history")
+
+def page_audit_history(actions, all_actions_count):
+    st.markdown('<div class="section-title">Audit history</div>', unsafe_allow_html=True)
     st.caption(
-        f"Showing {len(filtered_actions)} of {len(all_actions)} recorded actions using the current filters."
+        f"Showing {len(actions)} of {all_actions_count} recorded actions using the current filters."
     )
-    if not filtered_actions:
+    if not actions:
         st.markdown(
             '<div class="empty-state">No audit records match the current filters.</div>',
             unsafe_allow_html=True,
         )
-    else:
-        table_rows = []
-        for action in filtered_actions:
-            table_rows.append(
-                {
-                    "ID": action["id"],
-                    "Timestamp": format_timestamp(action["timestamp"]),
-                    "Action type": readable_action_type(action["action_type"]),
-                    "Financial": action["financial_score"],
-                    "Privacy": action["privacy_score"],
-                    "Policy": action["policy_score"],
-                    "Final score": action["final_score"],
-                    "Decision": decision_meta(action["decision"])["label"],
-                    "Resolution": action["resolution"] or "Open",
-                }
-            )
-        st.dataframe(table_rows, use_container_width=True, hide_index=True)
-        st.markdown("### Action details")
-        for action in filtered_actions:
-            render_action_card(action)
+        return
 
-with submit_tab:
-    st.subheader("Test an action")
+    table_rows = []
+    for action in actions:
+        table_rows.append(
+            {
+                "ID": action["id"],
+                "Timestamp": format_timestamp(action["timestamp"]),
+                "Action type": readable_action_type(action["action_type"]),
+                "Financial": action["financial_score"],
+                "Privacy": action["privacy_score"],
+                "Policy": action["policy_score"],
+                "Final score": action["final_score"],
+                "Decision": decision_meta(action["decision"])["label"],
+                "Resolution": action["resolution"] or "Open",
+            }
+        )
+    st.dataframe(table_rows, use_container_width=True, hide_index=True)
+
+    st.markdown('<div class="section-title">Action details</div>', unsafe_allow_html=True)
+    for action in actions:
+        render_action_card(action)
+
+
+def page_test_action():
+    st.markdown('<div class="section-title">Test an action</div>', unsafe_allow_html=True)
     st.caption("Submit a sample or custom action through the same trust and audit pipeline.")
     if "last_result" in st.session_state:
         show_decision_result(st.session_state["last_result"])
@@ -697,3 +1052,48 @@ with submit_tab:
                         language,
                     )
                 )
+
+
+def main():
+    st.set_page_config(
+        page_title="AI Trust Layer",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    init_db()
+    render_styles()
+
+    all_actions = load_actions()
+    query = render_topbar()
+
+    with st.sidebar:
+        render_sidebar()
+
+    selected_decisions = st.session_state.get("selected_decisions", DECISIONS)
+    selected_action_types = st.session_state.get("selected_action_types", ACTION_TYPES)
+
+    filtered_actions = filter_actions(all_actions, selected_decisions, selected_action_types)
+    if query:
+        filtered_actions = search_actions(filtered_actions, query)
+
+    open_escalations = get_open_escalations(filtered_actions)
+    decision_counts = count_decisions(filtered_actions)
+    average_score = (
+        sum(action["final_score"] for action in filtered_actions) / len(filtered_actions)
+        if filtered_actions
+        else 0
+    )
+
+    nav = st.session_state.get("nav", "Overview")
+    if nav == "Overview":
+        page_overview(filtered_actions, open_escalations, decision_counts, average_score)
+    elif nav == "Review Queue":
+        page_review_queue(filtered_actions, open_escalations)
+    elif nav == "Audit History":
+        page_audit_history(filtered_actions, len(all_actions))
+    else:
+        page_test_action()
+
+
+if __name__ == "__main__":
+    main()
