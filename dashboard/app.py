@@ -1,4 +1,3 @@
-import html
 import json
 import os
 import sys
@@ -10,6 +9,9 @@ if PROJECT_ROOT not in sys.path:
 os.chdir(PROJECT_ROOT)
 
 import streamlit as st
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
 
 from config import AUTO_APPROVE, AUTO_BLOCK, FLAG_FOR_REVIEW
 from database.audit import get_actions, init_db, resolve_action
@@ -20,32 +22,200 @@ from worker.agent import (
     create_transfer_money_action,
 )
 
+# ── Constants ─────────────────────────────────────────────────────────────────
 
 DECISIONS = ["approved", "approved_with_warning", "escalated", "blocked"]
 ACTION_TYPES = ["transfer_money", "send_email", "execute_code"]
-DECISION_META = {
-    "approved": {"label": "Approved", "risk": "Low risk", "tone": "approved"},
-    "approved_with_warning": {
-        "label": "Approved with warning",
-        "risk": "Moderate risk",
-        "tone": "warning",
-    },
-    "escalated": {"label": "Escalated", "risk": "High risk", "tone": "escalated"},
-    "blocked": {"label": "Blocked", "risk": "Critical risk", "tone": "blocked"},
-}
-ACTION_LABELS = {
-    "transfer_money": "Money transfer",
-    "send_email": "Email review",
-    "execute_code": "Code execution",
-}
-SAMPLE_ACTIONS = [
-    "Routine PKR transfer (approved)",
-    "Production cleanup command (warning)",
-    "High-risk transfer (escalated)",
-    "Email containing a CNIC (escalated)",
-    "International high-risk transfer (blocked)",
-]
 
+DECISION_COLORS = {
+    "approved": "#22c55e",
+    "approved_with_warning": "#f59e0b",
+    "escalated": "#f97316",
+    "blocked": "#ef4444",
+}
+
+DECISION_ICONS = {
+    "approved": "✅",
+    "approved_with_warning": "⚠️",
+    "escalated": "🔺",
+    "blocked": "🚫",
+}
+
+# ── Page config ───────────────────────────────────────────────────────────────
+
+st.set_page_config(
+    page_title="AI Trust Layer",
+    layout="wide",
+    page_icon="🛡️",
+    initial_sidebar_state="expanded",
+)
+
+# ── Custom CSS ────────────────────────────────────────────────────────────────
+
+st.markdown("""
+<style>
+  /* Import font */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Main background */
+  .stApp {
+    background-color: #0a0f1e;
+  }
+
+  /* Sidebar */
+  [data-testid="stSidebar"] {
+    background-color: #0d1526;
+    border-right: 1px solid #1e2d4a;
+  }
+
+  /* Metric cards */
+  [data-testid="metric-container"] {
+    background: linear-gradient(135deg, #0d1a33 0%, #111d38 100%);
+    border: 1px solid #1e2d4a;
+    border-radius: 12px;
+    padding: 20px !important;
+    transition: border-color 0.2s;
+  }
+  [data-testid="metric-container"]:hover {
+    border-color: #2e4a7a;
+  }
+  [data-testid="metric-container"] label {
+    color: #7a9cc4 !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  [data-testid="metric-container"] [data-testid="stMetricValue"] {
+    color: #e8f0fe !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Tabs */
+  .stTabs [data-baseweb="tab-list"] {
+    background-color: #0d1526;
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid #1e2d4a;
+  }
+  .stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    color: #7a9cc4;
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 8px 20px;
+  }
+  .stTabs [aria-selected="true"] {
+    background-color: #1e3a6e !important;
+    color: #e8f0fe !important;
+  }
+
+  /* Expander */
+  .streamlit-expanderHeader {
+    background-color: #0d1a33 !important;
+    border: 1px solid #1e2d4a !important;
+    border-radius: 8px !important;
+    color: #c8d8f0 !important;
+    font-weight: 500 !important;
+  }
+  .streamlit-expanderContent {
+    background-color: #0a1528 !important;
+    border: 1px solid #1e2d4a !important;
+    border-top: none !important;
+    border-radius: 0 0 8px 8px !important;
+  }
+
+  /* Buttons */
+  .stButton > button {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s !important;
+    border: 1px solid #1e2d4a !important;
+    background-color: #112040 !important;
+    color: #c8d8f0 !important;
+  }
+  .stButton > button:hover {
+    background-color: #1e3a6e !important;
+    border-color: #2e4a7a !important;
+    color: #ffffff !important;
+  }
+
+  /* Form inputs */
+  .stTextInput input, .stTextArea textarea, .stNumberInput input {
+    background-color: #0d1a33 !important;
+    border: 1px solid #1e2d4a !important;
+    border-radius: 8px !important;
+    color: #c8d8f0 !important;
+  }
+  .stSelectbox > div > div {
+    background-color: #0d1a33 !important;
+    border: 1px solid #1e2d4a !important;
+    border-radius: 8px !important;
+    color: #c8d8f0 !important;
+  }
+
+  /* Dataframe */
+  .stDataFrame {
+    border: 1px solid #1e2d4a;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Info / warning / success / error alerts */
+  .stAlert {
+    border-radius: 8px !important;
+    border: none !important;
+  }
+
+  /* Title */
+  h1 { color: #e8f0fe !important; font-weight: 700 !important; }
+  h2, h3 { color: #c8d8f0 !important; font-weight: 600 !important; }
+
+  /* Risk badge */
+  .risk-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  /* Score bar */
+  .score-bar-wrap {
+    background: #0d1a33;
+    border-radius: 999px;
+    height: 6px;
+    width: 100%;
+  }
+  .score-bar-fill {
+    height: 6px;
+    border-radius: 999px;
+  }
+
+  /* Band info pill */
+  .band-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+</style>
+""", unsafe_allow_html=True)
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def decode_json(value, default_value):
     if isinstance(value, str):
@@ -67,553 +237,405 @@ def load_actions():
 
 def filter_actions(actions, decisions, action_types):
     return [
-        action
-        for action in actions
-        if action["decision"] in decisions and action["action_type"] in action_types
+        a for a in actions
+        if a["decision"] in decisions and a["action_type"] in action_types
     ]
 
 
 def count_decisions(actions):
-    counts = {decision: 0 for decision in DECISIONS}
-    for action in actions:
-        counts[action["decision"]] += 1
+    counts = {d: 0 for d in DECISIONS}
+    for a in actions:
+        counts[a["decision"]] += 1
     return counts
 
 
 def get_open_escalations(actions):
-    return [
-        action
-        for action in actions
-        if action["decision"] == "escalated" and not action["resolved_by"]
-    ]
+    return [a for a in actions if a["decision"] == "escalated" and not a["resolved_by"]]
 
 
 def build_sample_action(sample_name):
     if sample_name == "Routine PKR transfer (approved)":
-        return create_transfer_money_action(
-            50000,
-            "PKR",
-            "Verified Vendor",
-            "Monthly office supplies invoice",
-        )
+        return create_transfer_money_action(50000, "PKR", "Verified Vendor", "Monthly office supplies invoice")
     if sample_name == "Production cleanup command (warning)":
-        return create_execute_code_action(
-            "DROP TABLE temporary_logs;",
-            "production",
-            "SQL",
-        )
+        return create_execute_code_action("DROP TABLE temporary_logs;", "production", "SQL")
     if sample_name == "High-risk transfer (escalated)":
-        return create_transfer_money_action(
-            250000,
-            "PKR",
-            "Unverified Vendor",
-            "Please call 03001234567 before processing.",
-        )
+        return create_transfer_money_action(250000, "PKR", "Unverified Vendor", "Please call 03001234567 before processing.")
     if sample_name == "Email containing a CNIC (escalated)":
-        return create_send_email_action(
-            "unknown@partner.example",
-            "Customer verification",
-            "Customer CNIC: 35202-1234567-1",
-            False,
-            "",
-        )
-    return create_transfer_money_action(
-        250000,
-        "USD",
-        "Unverified Vendor",
-        "Customer CNIC: 35202-1234567-1",
-    )
+        return create_send_email_action("unknown@partner.example", "Customer verification", "Customer CNIC: 35202-1234567-1", False, "")
+    return create_transfer_money_action(250000, "USD", "Unverified Vendor", "Customer CNIC: 35202-1234567-1")
 
 
-def decision_meta(decision):
-    return DECISION_META.get(
-        decision,
-        {"label": decision.replace("_", " ").title(), "risk": "Unknown", "tone": "warning"},
-    )
+def score_color(score):
+    if score <= AUTO_APPROVE:
+        return DECISION_COLORS["approved"]
+    elif score <= FLAG_FOR_REVIEW:
+        return DECISION_COLORS["approved_with_warning"]
+    elif score < AUTO_BLOCK:
+        return DECISION_COLORS["escalated"]
+    return DECISION_COLORS["blocked"]
 
 
-def readable_action_type(action_type):
-    return ACTION_LABELS.get(action_type, action_type.replace("_", " ").title())
-
-
-def format_amount(amount):
-    try:
-        return f"{float(amount):,.0f}"
-    except (TypeError, ValueError):
-        return str(amount or "0")
-
-
-def action_title(action):
-    details = action["details"]
-    if action["action_type"] == "transfer_money":
-        return f"{details.get('currency', 'PKR')} {format_amount(details.get('amount'))} transfer"
-    if action["action_type"] == "send_email":
-        return details.get("subject") or "Email review"
-    return f"{details.get('language', 'Code')} code execution"
-
-
-def action_summary(action):
-    details = action["details"]
-    if action["action_type"] == "transfer_money":
-        recipient = details.get("recipient") or "No recipient provided"
-        description = details.get("description") or "No description provided"
-        return f"To {recipient} · {description}"
-    if action["action_type"] == "send_email":
-        recipient = details.get("to") or "No recipient provided"
-        return f"To {recipient}"
-    environment = details.get("environment") or "No environment provided"
-    return f"Running in {environment}"
-
-
-def format_timestamp(timestamp):
-    return timestamp.replace("T", " ", 1) if timestamp else "Unknown time"
-
-
-def render_styles():
-    st.markdown(
-        """
-        <style>
-            .stApp {
-                background: #f6f8fc;
-                color: #172033;
-            }
-            .dashboard-header {
-                background: linear-gradient(125deg, #102a43, #1d4ed8);
-                border-radius: 20px;
-                color: #ffffff;
-                display: flex;
-                justify-content: space-between;
-                gap: 24px;
-                margin: 0 0 24px;
-                padding: 28px 30px;
-            }
-            .dashboard-header h1 {
-                color: #ffffff;
-                font-size: 2rem;
-                margin: 4px 0 8px;
-            }
-            .dashboard-header p {
-                color: #dbeafe;
-                margin: 0;
-            }
-            .eyebrow {
-                color: #bfdbfe;
-                font-size: 0.73rem;
-                font-weight: 700;
-                letter-spacing: 0.12em;
-            }
-            .header-rule {
-                align-self: center;
-                background: rgba(255, 255, 255, 0.12);
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                border-radius: 12px;
-                color: #eff6ff;
-                font-size: 0.8rem;
-                line-height: 1.5;
-                max-width: 330px;
-                padding: 12px 14px;
-            }
-            .metric-card {
-                background: #ffffff;
-                border: 1px solid #dfe6f2;
-                border-radius: 16px;
-                box-shadow: 0 5px 14px rgba(15, 23, 42, 0.04);
-                min-height: 130px;
-                padding: 18px;
-            }
-            .metric-card.approved { border-top: 4px solid #059669; }
-            .metric-card.warning { border-top: 4px solid #d97706; }
-            .metric-card.escalated { border-top: 4px solid #dc2626; }
-            .metric-card.blocked { border-top: 4px solid #7f1d1d; }
-            .metric-card.neutral { border-top: 4px solid #2563eb; }
-            .metric-label {
-                color: #667085;
-                font-size: 0.78rem;
-                font-weight: 700;
-                letter-spacing: 0.05em;
-                margin: 0;
-                text-transform: uppercase;
-            }
-            .metric-value {
-                color: #172033;
-                font-size: 2rem;
-                font-weight: 750;
-                line-height: 1.25;
-                margin: 9px 0 5px;
-            }
-            .metric-detail {
-                color: #667085;
-                font-size: 0.85rem;
-                margin: 0;
-            }
-            .decision-badge {
-                border-radius: 999px;
-                display: inline-block;
-                font-size: 0.76rem;
-                font-weight: 750;
-                padding: 6px 10px;
-                text-align: center;
-            }
-            .decision-badge.approved { background: #d1fae5; color: #065f46; }
-            .decision-badge.warning { background: #fef3c7; color: #92400e; }
-            .decision-badge.escalated { background: #fee2e2; color: #b42318; }
-            .decision-badge.blocked { background: #f3e8ff; color: #6b21a8; }
-            .action-stripe {
-                border-radius: 10px 10px 0 0;
-                height: 5px;
-                margin-bottom: -5px;
-                position: relative;
-                z-index: 1;
-            }
-            .action-stripe.approved { background: #059669; }
-            .action-stripe.warning { background: #d97706; }
-            .action-stripe.escalated { background: #dc2626; }
-            .action-stripe.blocked { background: #7f1d1d; }
-            .reason-heading {
-                color: #475467;
-                font-size: 0.8rem;
-                font-weight: 700;
-                margin: 14px 0 7px;
-                text-transform: uppercase;
-            }
-            .reason-chip {
-                background: #eef2f7;
-                border-radius: 999px;
-                color: #344054;
-                display: inline-block;
-                font-size: 0.8rem;
-                margin: 0 5px 6px 0;
-                padding: 5px 9px;
-            }
-            .empty-state {
-                background: #ffffff;
-                border: 1px dashed #cbd5e1;
-                border-radius: 16px;
-                color: #475467;
-                padding: 28px;
-                text-align: center;
-            }
-            [data-testid="stSidebar"] {
-                background: #ffffff;
-                border-right: 1px solid #e4e7ec;
-            }
-            [data-testid="stTabs"] button {
-                font-weight: 650;
-            }
-            [data-testid="stVerticalBlockBorderWrapper"] {
-                border-radius: 14px;
-            }
-            @media (max-width: 800px) {
-                .dashboard-header { display: block; padding: 22px; }
-                .header-rule { margin-top: 18px; }
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_header():
-    st.markdown(
-        f"""
-        <div class="dashboard-header">
-            <div>
-                <div class="eyebrow">RISK OPERATIONS</div>
-                <h1>AI Trust Layer</h1>
-                <p>Review decisions before actions are carried out.</p>
-            </div>
-            <div class="header-rule">
-                <strong>Decision bands</strong><br>
-                0–{AUTO_APPROVE} approved · {AUTO_APPROVE + 1}–{FLAG_FOR_REVIEW} warning<br>
-                {FLAG_FOR_REVIEW + 1}–{AUTO_BLOCK - 1} escalated · {AUTO_BLOCK}–100 blocked
-            </div>
+def render_score_bar(score, label=""):
+    color = score_color(score)
+    st.markdown(f"""
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
+          <span style="color:#7a9cc4;font-size:0.78rem;width:60px;">{label}</span>
+          <div class="score-bar-wrap" style="flex:1;">
+            <div class="score-bar-fill" style="width:{score}%;background:{color};"></div>
+          </div>
+          <span style="color:#e8f0fe;font-size:0.8rem;font-weight:600;width:28px;text-align:right;">{score}</span>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_metric_card(label, value, detail, tone="neutral"):
-    st.markdown(
-        f"""
-        <div class="metric-card {tone}">
-            <p class="metric-label">{html.escape(str(label))}</p>
-            <p class="metric-value">{html.escape(str(value))}</p>
-            <p class="metric-detail">{html.escape(str(detail))}</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_decision_badge(decision):
-    meta = decision_meta(decision)
-    st.markdown(
-        f'<span class="decision-badge {meta["tone"]}">{html.escape(meta["label"])}</span>',
-        unsafe_allow_html=True,
-    )
-
-
-def render_reason_chips(reasons):
-    st.markdown('<div class="reason-heading">Risk signals</div>', unsafe_allow_html=True)
-    if not reasons:
-        st.markdown(
-            '<span class="reason-chip">No risk indicators recorded</span>',
-            unsafe_allow_html=True,
-        )
-        return
-    chips = "".join(
-        f'<span class="reason-chip">{html.escape(str(reason))}</span>'
-        for reason in reasons
-    )
-    st.markdown(chips, unsafe_allow_html=True)
-
-
-def resolve_review_action(action_id, reviewer_name, resolution):
-    reviewer_name = reviewer_name.strip()
-    if not reviewer_name:
-        st.warning("Enter a reviewer name before resolving an escalation.")
-        return
-    resolve_action(action_id, reviewer_name, resolution)
-    st.session_state["review_message"] = (
-        f"Action {action_id} was {resolution} by {reviewer_name}."
-    )
-    st.rerun()
-
-
-def render_action_card(action, reviewer_name="", allow_resolution=False):
-    meta = decision_meta(action["decision"])
-    score = max(0, min(100, int(action["final_score"])))
-    st.markdown(
-        f'<div class="action-stripe {meta["tone"]}"></div>',
-        unsafe_allow_html=True,
-    )
-    with st.container(border=True):
-        title_column, badge_column = st.columns([4, 1])
-        with title_column:
-            st.subheader(action_title(action))
-            st.caption(
-                f"Action #{action['id']} · {readable_action_type(action['action_type'])} "
-                f"· {format_timestamp(action['timestamp'])}"
-            )
-        with badge_column:
-            render_decision_badge(action["decision"])
-            st.caption(f"Score {score}/100")
-
-        st.write(action_summary(action))
-        st.caption(f"{meta['risk']} · final trust score")
-        st.progress(score / 100)
-
-        financial_column, privacy_column, policy_column = st.columns(3)
-        financial_column.metric("Financial", action["financial_score"])
-        privacy_column.metric("Privacy", action["privacy_score"])
-        policy_column.metric("Policy", action["policy_score"])
-
-        render_reason_chips(action["reasons"])
-
-        with st.expander("View complete action details"):
-            st.json(action["details"])
-            if action["resolved_by"]:
-                st.success(
-                    f"Resolved as {action['resolution']} by {action['resolved_by']} "
-                    f"at {format_timestamp(action['resolution_time'])}."
-                )
-
-        if allow_resolution:
-            st.divider()
-            st.caption("Human decision required")
-            approve_column, reject_column, spacer_column = st.columns([1, 1, 3])
-            if approve_column.button("Approve", key=f"approve_{action['id']}"):
-                resolve_review_action(action["id"], reviewer_name, "approved")
-            if reject_column.button("Reject", key=f"reject_{action['id']}"):
-                resolve_review_action(action["id"], reviewer_name, "rejected")
-            spacer_column.empty()
+    """, unsafe_allow_html=True)
 
 
 def show_decision_result(result):
     decision = result["decision"]
-    meta = decision_meta(decision)
-    with st.container(border=True):
-        title_column, score_column = st.columns([4, 1])
-        with title_column:
-            st.subheader("Latest trust decision")
-            render_decision_badge(decision)
-        with score_column:
-            st.metric("Final score", result["final_score"])
+    color = DECISION_COLORS[decision]
+    icon = DECISION_ICONS[decision]
+    label = decision.replace("_", " ").title()
 
-        message = f"{meta['label']} · {meta['risk']}"
-        if decision == "approved":
-            st.success(message)
-        elif decision in {"approved_with_warning", "escalated"}:
-            st.warning(message)
-        else:
-            st.error(message)
+    st.markdown(f"""
+        <div style="background:linear-gradient(135deg,#0d1a33,#111d38);border:1px solid {color}44;
+                    border-left:4px solid {color};border-radius:10px;padding:16px 20px;margin:12px 0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:1.4rem;">{icon}</span>
+            <span style="color:{color};font-size:1.1rem;font-weight:700;">{label}</span>
+            <span style="color:#7a9cc4;font-size:0.875rem;margin-left:auto;">
+              Final score: <b style="color:#e8f0fe;">{result['final_score']}</b>
+            </span>
+          </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-        if result.get("action_id"):
-            st.caption(f"Audit action #{result['action_id']} was recorded.")
-        render_reason_chips(result["reasons"])
+    if result["reasons"]:
+        st.markdown("<div style='margin-top:8px;'>", unsafe_allow_html=True)
+        for reason in result["reasons"]:
+            st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {reason}</span><br>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def submit_action(action):
     st.session_state["last_result"] = intercept_action(action)
     st.rerun()
 
+# ── Init ──────────────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="AI Trust Layer", layout="wide")
 init_db()
-render_styles()
-render_header()
+
+# ── Header ────────────────────────────────────────────────────────────────────
+
+st.markdown("""
+<div style="display:flex;align-items:center;gap:14px;padding:8px 0 20px;">
+  <span style="font-size:2.2rem;">🛡️</span>
+  <div>
+    <h1 style="margin:0;font-size:1.8rem;">AI Trust Layer</h1>
+    <p style="margin:0;color:#7a9cc4;font-size:0.9rem;">Review and govern AI-initiated actions in real time</p>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Decision band pills
+st.markdown(f"""
+<div style="margin-bottom:24px;">
+  <span class="band-pill" style="background:#22c55e18;color:#22c55e;">✅ 0–{AUTO_APPROVE} Approved</span>
+  <span class="band-pill" style="background:#f59e0b18;color:#f59e0b;">⚠️ {AUTO_APPROVE+1}–{FLAG_FOR_REVIEW} Warning</span>
+  <span class="band-pill" style="background:#f9731618;color:#f97316;">🔺 {FLAG_FOR_REVIEW+1}–{AUTO_BLOCK-1} Escalated</span>
+  <span class="band-pill" style="background:#ef444418;color:#ef4444;">🚫 {AUTO_BLOCK}–100 Blocked</span>
+</div>
+""", unsafe_allow_html=True)
+
+# ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.markdown("## Review filters")
-    st.caption("Control which actions appear in audit history and the command center.")
+    st.markdown("### 🎛️ Filters")
     selected_decisions = st.multiselect(
         "Decision status",
         DECISIONS,
         default=DECISIONS,
-        format_func=lambda decision: decision_meta(decision)["label"],
+        format_func=lambda d: f"{DECISION_ICONS[d]}  {d.replace('_', ' ').title()}",
     )
     selected_action_types = st.multiselect(
         "Action type",
         ACTION_TYPES,
         default=ACTION_TYPES,
-        format_func=readable_action_type,
+        format_func=lambda t: t.replace("_", " ").title(),
     )
-    st.divider()
-    if st.button("Refresh data", use_container_width=True):
+    st.markdown("---")
+    if st.button("🔄 Refresh data", use_container_width=True):
         st.rerun()
-    st.caption("Every action is evaluated and written to the SQLite audit trail.")
+
+# ── Data ──────────────────────────────────────────────────────────────────────
 
 all_actions = load_actions()
-filtered_actions = filter_actions(
-    all_actions,
-    selected_decisions,
-    selected_action_types,
-)
+filtered_actions = filter_actions(all_actions, selected_decisions, selected_action_types)
 decision_counts = count_decisions(all_actions)
 open_escalations = get_open_escalations(all_actions)
 average_score = (
-    sum(action["final_score"] for action in all_actions) / len(all_actions)
-    if all_actions
-    else 0
+    sum(a["final_score"] for a in all_actions) / len(all_actions) if all_actions else 0
 )
 
-metric_columns = st.columns(4)
-with metric_columns[0]:
-    render_metric_card("Total actions", len(all_actions), "All recorded trust decisions")
-with metric_columns[1]:
-    render_metric_card(
-        "Needs review",
-        len(open_escalations),
-        "Open escalations awaiting a human",
-        "escalated",
-    )
-with metric_columns[2]:
-    render_metric_card(
-        "Blocked actions",
-        decision_counts["blocked"],
-        "Actions stopped automatically",
-        "blocked",
-    )
-with metric_columns[3]:
-    render_metric_card(
-        "Average risk",
-        f"{average_score:.1f}",
-        "Average final trust score",
-        "warning" if average_score > AUTO_APPROVE else "approved",
-    )
+# ── Metrics row ───────────────────────────────────────────────────────────────
 
-overview_tab, review_tab, audit_tab, submit_tab = st.tabs(
-    ["Overview", "Review queue", "Audit history", "Test an action"]
-)
+c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
+c1.metric("Total Actions", len(all_actions))
+c2.metric("Open Escalations", len(open_escalations))
+c3.metric("Avg Risk Score", f"{average_score:.1f}")
+c4.metric("✅ Approved", decision_counts["approved"])
+c5.metric("⚠️ Warnings", decision_counts["approved_with_warning"])
+c6.metric("🔺 Escalated", decision_counts["escalated"])
+c7.metric("🚫 Blocked", decision_counts["blocked"])
 
-with overview_tab:
-    st.subheader("Risk overview")
-    overview_left, overview_right = st.columns([2, 1])
-    with overview_left:
-        st.write(
-            "Monitor the latest trust decisions and open high-risk actions from one place."
+st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+
+# ── Charts row ────────────────────────────────────────────────────────────────
+
+if all_actions:
+    chart_col1, chart_col2 = st.columns([1, 2])
+
+    with chart_col1:
+        # Donut chart — decision breakdown
+        labels = [d.replace("_", " ").title() for d in DECISIONS]
+        values = [decision_counts[d] for d in DECISIONS]
+        colors = [DECISION_COLORS[d] for d in DECISIONS]
+
+        fig_donut = go.Figure(go.Pie(
+            labels=labels,
+            values=values,
+            hole=0.65,
+            marker=dict(colors=colors, line=dict(color="#0a0f1e", width=2)),
+            textinfo="none",
+            hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Share: %{percent}<extra></extra>",
+        ))
+        fig_donut.add_annotation(
+            text=f"<b>{len(all_actions)}</b><br><span style='font-size:10px'>actions</span>",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=18, color="#e8f0fe"),
         )
-    with overview_right:
-        if open_escalations:
-            st.warning(f"{len(open_escalations)} action(s) require human review.")
-        else:
-            st.success("No actions currently require human review.")
+        fig_donut.update_layout(
+            title=dict(text="Decision Breakdown", font=dict(color="#c8d8f0", size=14)),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#7a9cc4"),
+            legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)"),
+            margin=dict(t=40, b=10, l=10, r=10),
+            height=280,
+        )
+        st.plotly_chart(fig_donut, use_container_width=True)
 
-    st.markdown("### Latest actions")
+    with chart_col2:
+        # Bar chart — score distribution by action type
+        if filtered_actions:
+            df = pd.DataFrame(filtered_actions)
+            fig_bar = px.box(
+                df,
+                x="action_type",
+                y="final_score",
+                color="decision",
+                color_discrete_map=DECISION_COLORS,
+                labels={"action_type": "Action Type", "final_score": "Risk Score", "decision": "Decision"},
+                title="Risk Score Distribution by Action Type",
+            )
+            fig_bar.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#7a9cc4"),
+                title=dict(font=dict(color="#c8d8f0", size=14)),
+                legend=dict(font=dict(color="#c8d8f0"), bgcolor="rgba(0,0,0,0)"),
+                xaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0")),
+                yaxis=dict(gridcolor="#1e2d4a", tickfont=dict(color="#c8d8f0"), range=[0, 100]),
+                margin=dict(t=40, b=10, l=10, r=10),
+                height=280,
+            )
+            st.plotly_chart(fig_bar, use_container_width=True)
+
+st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+
+# ── Tabs ──────────────────────────────────────────────────────────────────────
+
+audit_tab, review_tab, submit_tab = st.tabs([
+    "📋  Audit Log",
+    f"🔺  Review Queue  {'  🔴 ' + str(len(open_escalations)) if open_escalations else ''}",
+    "🧪  Submit Test Action",
+])
+
+# ── Audit log ─────────────────────────────────────────────────────────────────
+
+with audit_tab:
     if not filtered_actions:
-        st.markdown(
-            '<div class="empty-state">No audit records match the current filters.</div>',
-            unsafe_allow_html=True,
-        )
+        st.info("No audit records match the current filters.")
     else:
-        for index in range(0, min(len(filtered_actions), 6), 2):
-            action_columns = st.columns(2)
-            for column, action in zip(action_columns, filtered_actions[index : index + 2]):
-                with column:
-                    render_action_card(action)
+        # Coloured table
+        df = pd.DataFrame([
+            {
+                "ID": a["id"],
+                "Timestamp": a["timestamp"],
+                "Type": a["action_type"].replace("_", " ").title(),
+                "Financial": a["financial_score"],
+                "Privacy": a["privacy_score"],
+                "Policy": a["policy_score"],
+                "Final": a["final_score"],
+                "Decision": DECISION_ICONS[a["decision"]] + " " + a["decision"].replace("_", " ").title(),
+                "Resolution": a["resolution"] or "Open",
+            }
+            for a in filtered_actions
+        ])
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Final": st.column_config.ProgressColumn(
+                    "Final Score",
+                    help="Final risk score (0–100)",
+                    min_value=0,
+                    max_value=100,
+                    format="%d",
+                ),
+                "Financial": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+                "Privacy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+                "Policy": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%d"),
+            },
+        )
+
+        st.markdown(f"<p style='color:#7a9cc4;font-size:0.82rem;margin-top:6px;'>"
+                    f"Showing {len(filtered_actions)} of {len(all_actions)} actions</p>",
+                    unsafe_allow_html=True)
+
+        st.markdown("### Action details")
+        for action in filtered_actions:
+            dec = action["decision"]
+            color = DECISION_COLORS[dec]
+            with st.expander(
+                f"{DECISION_ICONS[dec]}  Action {action['id']}  ·  "
+                f"{action['action_type'].replace('_', ' ').title()}  ·  "
+                f"Score {action['final_score']}"
+            ):
+                left, right = st.columns([1, 1])
+                with left:
+                    st.markdown("**Score breakdown**")
+                    render_score_bar(action["financial_score"], "Financial")
+                    render_score_bar(action["privacy_score"], "Privacy")
+                    render_score_bar(action["policy_score"], "Policy")
+                    render_score_bar(action["final_score"], "Final")
+                with right:
+                    st.markdown("**Action details**")
+                    st.json(action["details"])
+
+                if action["reasons"]:
+                    st.markdown("**Risk reasons**")
+                    for r in action["reasons"]:
+                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
+                                    unsafe_allow_html=True)
+
+                if action["resolved_by"]:
+                    st.markdown(
+                        f"<div style='margin-top:10px;padding:10px;background:#0d1a33;"
+                        f"border-radius:8px;border:1px solid #1e2d4a;'>"
+                        f"<span style='color:#7a9cc4;font-size:0.82rem;'>"
+                        f"Resolved by <b style='color:#c8d8f0;'>{action['resolved_by']}</b> · "
+                        f"{action['resolution']} · {action['resolution_time']}"
+                        f"</span></div>",
+                        unsafe_allow_html=True,
+                    )
+
+# ── Review queue ──────────────────────────────────────────────────────────────
 
 with review_tab:
-    st.subheader("Review queue")
-    st.caption("Resolve escalated actions after reviewing their checker scores and risk signals.")
     if "review_message" in st.session_state:
         st.success(st.session_state.pop("review_message"))
 
     if not open_escalations:
-        st.markdown(
-            '<div class="empty-state">There are no open escalations. New high-risk actions will appear here.</div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown("""
+        <div style="text-align:center;padding:48px 0;">
+          <div style="font-size:3rem;">✅</div>
+          <p style="color:#22c55e;font-weight:600;font-size:1.1rem;margin:8px 0;">All clear</p>
+          <p style="color:#7a9cc4;font-size:0.9rem;">No open escalations require attention.</p>
+        </div>
+        """, unsafe_allow_html=True)
     else:
+        st.markdown(f"<p style='color:#f97316;font-weight:600;'>"
+                    f"🔺 {len(open_escalations)} action(s) need your review</p>",
+                    unsafe_allow_html=True)
+
         reviewer_name = st.text_input(
-            "Reviewer name",
-            placeholder="Enter your name before resolving an escalation",
+            "Your name",
+            placeholder="Enter your name before approving or rejecting",
+            help="Required for audit trail",
         )
+
         for action in open_escalations:
-            render_action_card(action, reviewer_name, allow_resolution=True)
+            with st.expander(
+                f"🔺  Action {action['id']}  ·  "
+                f"{action['action_type'].replace('_', ' ').title()}  ·  "
+                f"Score {action['final_score']}"
+            ):
+                left, right = st.columns([1, 1])
+                with left:
+                    st.markdown("**Score breakdown**")
+                    render_score_bar(action["financial_score"], "Financial")
+                    render_score_bar(action["privacy_score"], "Privacy")
+                    render_score_bar(action["policy_score"], "Policy")
+                    render_score_bar(action["final_score"], "Final")
+                with right:
+                    st.markdown("**Action details**")
+                    st.json(action["details"])
 
-    resolved_actions = [action for action in all_actions if action["resolved_by"]]
-    if resolved_actions:
+                if action["reasons"]:
+                    st.markdown("**Risk reasons**")
+                    for r in action["reasons"]:
+                        st.markdown(f"<span style='color:#f59e0b;font-size:0.85rem;'>⚡ {r}</span>",
+                                    unsafe_allow_html=True)
+
+                st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+                approve_col, reject_col = st.columns(2)
+
+                if approve_col.button(
+                    "✅  Approve", key=f"approve_{action['id']}", use_container_width=True
+                ):
+                    if not reviewer_name.strip():
+                        st.warning("Enter your name before resolving.")
+                    else:
+                        resolve_action(action["id"], reviewer_name.strip(), "approved")
+                        st.session_state["review_message"] = (
+                            f"Action {action['id']} approved by {reviewer_name.strip()}."
+                        )
+                        st.rerun()
+
+                if reject_col.button(
+                    "🚫  Reject", key=f"reject_{action['id']}", use_container_width=True
+                ):
+                    if not reviewer_name.strip():
+                        st.warning("Enter your name before resolving.")
+                    else:
+                        resolve_action(action["id"], reviewer_name.strip(), "rejected")
+                        st.session_state["review_message"] = (
+                            f"Action {action['id']} rejected by {reviewer_name.strip()}."
+                        )
+                        st.rerun()
+
+    resolved = [a for a in all_actions if a["resolved_by"]]
+    if resolved:
+        st.markdown("---")
         st.markdown("### Recently resolved")
-        for action in resolved_actions[:3]:
-            render_action_card(action)
-
-with audit_tab:
-    st.subheader("Audit history")
-    st.caption(
-        f"Showing {len(filtered_actions)} of {len(all_actions)} recorded actions using the current filters."
-    )
-    if not filtered_actions:
-        st.markdown(
-            '<div class="empty-state">No audit records match the current filters.</div>',
-            unsafe_allow_html=True,
-        )
-    else:
-        table_rows = []
-        for action in filtered_actions:
-            table_rows.append(
-                {
-                    "ID": action["id"],
-                    "Timestamp": format_timestamp(action["timestamp"]),
-                    "Action type": readable_action_type(action["action_type"]),
-                    "Financial": action["financial_score"],
-                    "Privacy": action["privacy_score"],
-                    "Policy": action["policy_score"],
-                    "Final score": action["final_score"],
-                    "Decision": decision_meta(action["decision"])["label"],
-                    "Resolution": action["resolution"] or "Open",
-                }
+        for a in resolved:
+            color = "#22c55e" if a["resolution"] == "approved" else "#ef4444"
+            st.markdown(
+                f"<div style='padding:8px 14px;margin:4px 0;background:#0d1a33;"
+                f"border-radius:8px;border-left:3px solid {color};'>"
+                f"<span style='color:#c8d8f0;font-size:0.85rem;'>"
+                f"Action {a['id']} — <b style='color:{color};'>{a['resolution']}</b>"
+                f" by {a['resolved_by']} · {a['resolution_time']}"
+                f"</span></div>",
+                unsafe_allow_html=True,
             )
-        st.dataframe(table_rows, use_container_width=True, hide_index=True)
-        st.markdown("### Action details")
-        for action in filtered_actions:
-            render_action_card(action)
+
+# ── Submit test action ────────────────────────────────────────────────────────
 
 with submit_tab:
-    st.subheader("Test an action")
-    st.caption("Submit a sample or custom action through the same trust and audit pipeline.")
     if "last_result" in st.session_state:
         show_decision_result(st.session_state["last_result"])
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
 
     submission_mode = st.radio(
         "Submission mode",
@@ -623,69 +645,56 @@ with submit_tab:
 
     if submission_mode == "Use a sample action":
         with st.form("sample_action_form"):
-            sample_name = st.selectbox("Sample action", SAMPLE_ACTIONS)
-            sample_submitted = st.form_submit_button("Evaluate sample action")
-
-        if sample_submitted:
+            sample_name = st.selectbox(
+                "Select a sample action",
+                [
+                    "Routine PKR transfer (approved)",
+                    "Production cleanup command (warning)",
+                    "High-risk transfer (escalated)",
+                    "Email containing a CNIC (escalated)",
+                    "International high-risk transfer (blocked)",
+                ],
+            )
+            submitted = st.form_submit_button("🚀  Evaluate sample action", use_container_width=True)
+        if submitted:
             submit_action(build_sample_action(sample_name))
+
     else:
         action_type = st.selectbox(
             "Action type",
             ACTION_TYPES,
-            format_func=readable_action_type,
+            format_func=lambda t: t.replace("_", " ").title(),
         )
 
         if action_type == "transfer_money":
             with st.form("transfer_action_form"):
-                amount = st.number_input("Amount", min_value=0.0, step=1000.0)
-                currency = st.text_input("Currency", value="PKR")
+                col_a, col_b = st.columns(2)
+                amount = col_a.number_input("Amount", min_value=0.0, step=1000.0)
+                currency = col_b.text_input("Currency", value="PKR")
                 recipient = st.text_input("Recipient")
-                description = st.text_area("Description")
-                transfer_submitted = st.form_submit_button("Evaluate transfer")
+                description = st.text_area("Description", height=100)
+                submitted = st.form_submit_button("🚀  Evaluate transfer", use_container_width=True)
+            if submitted:
+                submit_action(create_transfer_money_action(amount, currency, recipient, description))
 
-            if transfer_submitted:
-                submit_action(
-                    create_transfer_money_action(
-                        amount,
-                        currency,
-                        recipient,
-                        description,
-                    )
-                )
         elif action_type == "send_email":
             with st.form("email_action_form"):
-                recipient = st.text_input("Recipient email")
-                subject = st.text_input("Subject")
-                body = st.text_area("Email body")
+                col_a, col_b = st.columns(2)
+                recipient = col_a.text_input("Recipient email")
+                subject = col_b.text_input("Subject")
+                body = st.text_area("Email body", height=120)
                 has_attachment = st.checkbox("Has attachment")
-                attachment_name = st.text_input("Attachment name")
-                email_submitted = st.form_submit_button("Evaluate email")
+                attachment_name = st.text_input("Attachment name", disabled=not has_attachment)
+                submitted = st.form_submit_button("🚀  Evaluate email", use_container_width=True)
+            if submitted:
+                submit_action(create_send_email_action(recipient, subject, body, has_attachment, attachment_name))
 
-            if email_submitted:
-                submit_action(
-                    create_send_email_action(
-                        recipient,
-                        subject,
-                        body,
-                        has_attachment,
-                        attachment_name,
-                    )
-                )
         else:
             with st.form("code_action_form"):
-                code = st.text_area("Code")
-                environment = st.selectbox(
-                    "Environment",
-                    ["development", "staging", "production"],
-                )
-                language = st.text_input("Language", value="Python")
-                code_submitted = st.form_submit_button("Evaluate code")
-
-            if code_submitted:
-                submit_action(
-                    create_execute_code_action(
-                        code,
-                        environment,
-                        language,
-                    )
-                )
+                code = st.text_area("Code", height=140)
+                col_a, col_b = st.columns(2)
+                environment = col_a.selectbox("Environment", ["development", "staging", "production"])
+                language = col_b.text_input("Language", value="Python")
+                submitted = st.form_submit_button("🚀  Evaluate code", use_container_width=True)
+            if submitted:
+                submit_action(create_execute_code_action(code, environment, language))
