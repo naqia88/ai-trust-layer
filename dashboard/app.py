@@ -550,18 +550,36 @@ def render_styles():
             textarea,
             [data-baseweb="input"] input,
             [data-baseweb="textarea"] textarea,
-            [data-baseweb="select"] > div {
+            [data-baseweb="select"] > div,
+            [data-baseweb="select"] [role="button"],
+            [data-baseweb="select"] [data-testid="stMultiSelect"],
+            [data-baseweb="select"] input {
                 color: #000000 !important;
                 background: #ffffff !important;
                 border-color: #f97316 !important;
+            }
+            input::placeholder,
+            [data-baseweb="input"] input::placeholder,
+            [data-baseweb="textarea"] textarea::placeholder,
+            [data-baseweb="select"] input::placeholder {
+                color: #000000 !important;
+                opacity: 0.8 !important;
             }
             input:focus,
             textarea:focus,
             [data-baseweb="input"] input:focus,
             [data-baseweb="textarea"] textarea:focus,
-            [data-baseweb="select"] > div:focus {
+            [data-baseweb="select"] > div:focus,
+            [data-baseweb="select"] input:focus {
                 border-color: #f97316 !important;
                 box-shadow: 0 0 0 1px #f97316 !important;
+            }
+            .js-plotly-plot .plotly text,
+            .js-plotly-plot .plotly .gtitle,
+            .js-plotly-plot .plotly .legendtext,
+            .js-plotly-plot .plotly .xtick text,
+            .js-plotly-plot .plotly .ytick text {
+                fill: #000000 !important;
             }
             [data-testid="stDataFrame"] {
                 color: #000000 !important;
@@ -874,11 +892,17 @@ def style_figure(fig):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#ffedd5",
         font_color="#000000",
+        title_font_color="#000000",
         margin=dict(l=10, r=10, t=30, b=30),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.25),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.25,
+            font=dict(color="#000000"),
+        ),
     )
-    fig.update_xaxes(showgrid=False, zeroline=False)
-    fig.update_yaxes(gridcolor="#fed7aa", gridwidth=1)
+    fig.update_xaxes(showgrid=False, zeroline=False, tickfont=dict(color="#000000"))
+    fig.update_yaxes(gridcolor="#fed7aa", gridwidth=1, tickfont=dict(color="#000000"))
     return fig
 
 
