@@ -581,8 +581,13 @@ def render_styles():
             .js-plotly-plot .plotly .ytick text {
                 fill: #000000 !important;
             }
-            [data-testid="stDataFrame"] {
+            [data-testid="stDataFrame"],
+            [data-testid="stDataFrame"] td,
+            [data-testid="stDataFrame"] th,
+            [data-testid="stDataFrame"] [role="gridcell"],
+            [data-testid="stDataFrame"] [role="columnheader"] {
                 color: #000000 !important;
+                background: #ffffff !important;
             }
             @media (max-width: 800px) {
                 .metric-tile { min-height: auto; padding: 14px; }
