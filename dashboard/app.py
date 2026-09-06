@@ -207,6 +207,38 @@ def format_timestamp(timestamp):
     return timestamp.replace("T", " ", 1) if timestamp else "Unknown time"
 
 
+def relative_time(timestamp):
+    if not timestamp:
+        return "Unknown time"
+    try:
+        dt = datetime.fromisoformat(timestamp)
+    except (TypeError, ValueError):
+        return format_timestamp(timestamp)
+    now = datetime.now()
+    diff = now - dt
+    seconds = int(diff.total_seconds())
+    if seconds < 60:
+        return "Just now"
+    if seconds < 3600:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    if seconds < 86400:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    days = seconds // 86400
+    if days < 30:
+        return f"{days} day{'s' if days != 1 else ''} ago"
+    return format_timestamp(timestamp)
+
+
+def action_icon(action_type):
+    return {
+        "transfer_money": "💸",
+        "send_email": "✉️",
+        "execute_code": "💻",
+    }.get(action_type, "📝")
+
+
 def render_styles():
     st.markdown(
         """
@@ -415,6 +447,55 @@ def render_styles():
                 color: #000000;
                 padding: 32px;
                 text-align: center;
+            }
+            .timeline {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+            }
+            .timeline-item {
+                display: flex;
+                gap: 16px;
+                padding: 16px 0;
+                position: relative;
+            }
+            .timeline-item:not(:last-child) {
+                border-bottom: 1px solid #fed7aa;
+            }
+            .timeline-marker {
+                align-items: center;
+                background: #ffedd5;
+                border: 2px solid #f97316;
+                border-radius: 999px;
+                color: #000000;
+                display: flex;
+                flex-shrink: 0;
+                font-size: 1.1rem;
+                height: 40px;
+                justify-content: center;
+                width: 40px;
+            }
+            .timeline-marker.approved { background: #d1fae5; border-color: #10b981; }
+            .timeline-marker.warning { background: #fef3c7; border-color: #f59e0b; }
+            .timeline-marker.escalated { background: #ede9fe; border-color: #8b5cf6; }
+            .timeline-marker.blocked { background: #fee2e2; border-color: #ef4444; }
+            .timeline-body { flex: 1; min-width: 0; }
+            .timeline-title {
+                color: #000000;
+                font-size: 0.95rem;
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+            .timeline-meta {
+                color: #000000;
+                font-size: 0.78rem;
+                margin-bottom: 6px;
+                opacity: 0.85;
+            }
+            .timeline-score {
+                color: #000000;
+                font-size: 0.8rem;
+                font-weight: 600;
             }
             [data-testid="stVerticalBlockBorderWrapper"] {
                 background: #ffedd5 !important;
@@ -796,6 +877,41 @@ def render_action_card(action, reviewer_name="", allow_resolution=False):
             spacer_column.empty()
 
 
+def render_activity_timeline(actions):
+    if not actions:
+        st.markdown(
+            '<div class="empty-state">No audit records match the current filters.</div>',
+            unsafe_allow_html=True,
+        )
+        return
+
+    items_html = ['<div class="timeline">']
+    for action in actions[:10]:
+        meta = decision_meta(action["decision"])
+        score = max(0, min(100, int(action["final_score"])))
+        score_meta = risk_meta(score)
+        icon = action_icon(action["action_type"])
+        title = html.escape(action_title(action))
+        action_type_label = html.escape(readable_action_type(action["action_type"]))
+        time_label = html.escape(relative_time(action["timestamp"]))
+        summary = html.escape(action_summary(action))
+        decision_label = html.escape(meta["label"])
+        score_label = html.escape(score_meta["label"])
+        items_html.append(
+            f'<div class="timeline-item">'
+            f'<div class="timeline-marker {meta["tone"]}">{icon}</div>'
+            f'<div class="timeline-body">'
+            f'<div class="timeline-title">{title}</div>'
+            f'<div class="timeline-meta">{action_type_label} · {time_label} · '
+            f'<span class="decision-badge {meta["tone"]}">{decision_label}</span></div>'
+            f'<div class="timeline-score">Score {score} · {score_label} risk</div>'
+            f'<div style="color:#000000;font-size:0.82rem;margin-top:4px;">{summary}</div>'
+            f'</div></div>'
+        )
+    items_html.append("</div>")
+    st.markdown("".join(items_html), unsafe_allow_html=True)
+
+
 def show_decision_result(result):
     decision = result["decision"]
     meta = decision_meta(decision)
@@ -897,6 +1013,7 @@ def style_figure(fig):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#ffedd5",
         font_color="#000000",
+        title=dict(text=""),
         title_font_color="#000000",
         margin=dict(l=10, r=10, t=30, b=30),
         legend=dict(
@@ -923,31 +1040,29 @@ def build_trend_chart(df):
         y="final_score",
         markers=True,
         color_discrete_sequence=["#f97316"],
+        labels={"final_score": "Trust score"},
     )
-    fig.add_hline(
-        y=AUTO_APPROVE,
-        line_dash="dot",
-        line_color="#10b981",
-        annotation_text="Approve",
-        annotation_position="bottom right",
-    )
-    fig.add_hline(
-        y=FLAG_FOR_REVIEW,
-        line_dash="dot",
-        line_color="#f59e0b",
-        annotation_text="Warning",
-        annotation_position="bottom right",
-    )
-    fig.add_hline(
-        y=AUTO_BLOCK,
-        line_dash="dot",
-        line_color="#ef4444",
-        annotation_text="Block",
-        annotation_position="bottom right",
-    )
+    fig.update_traces(name="Final score")
+    for y, color, text in [
+        (AUTO_APPROVE, "#10b981", "Approve"),
+        (FLAG_FOR_REVIEW, "#f59e0b", "Warning"),
+        (AUTO_BLOCK, "#ef4444", "Block"),
+    ]:
+        fig.add_hline(y=y, line_dash="dot", line_color=color)
+        fig.add_annotation(
+            x=df["timestamp"].max(),
+            y=y,
+            text=text,
+            showarrow=False,
+            font=dict(color=color, size=10),
+            yanchor="bottom",
+            xanchor="right",
+            yshift=4,
+        )
     fig.update_yaxes(range=[0, 100])
-    fig.update_xaxes(title_text=None)
+    fig.update_xaxes(title_text="Time")
     fig.update_yaxes(title_text="Trust score")
+    fig.update_layout(showlegend=False)
     return style_figure(fig)
 
 
@@ -970,6 +1085,7 @@ def build_donut_chart(df):
         color_discrete_map=color_map,
     )
     fig.update_traces(textinfo="percent+label", pull=None)
+    fig.update_layout(legend_title_text="Decision")
     return style_figure(fig)
 
 
@@ -994,8 +1110,9 @@ def build_breakdown_chart(df):
         barmode="stack",
         color_discrete_map=color_map,
     )
-    fig.update_xaxes(title_text=None)
-    fig.update_yaxes(title_text=None)
+    fig.update_xaxes(title_text="Action type")
+    fig.update_yaxes(title_text="Count")
+    fig.update_layout(legend_title_text="Decision")
     return style_figure(fig)
 
 
@@ -1102,18 +1219,8 @@ def page_overview(actions, open_escalations, decision_counts, average_score):
             key="breakdown_chart",
         )
 
-    st.markdown('<div class="section-title">Latest actions</div>', unsafe_allow_html=True)
-    if not actions:
-        st.markdown(
-            '<div class="empty-state">No audit records match the current filters.</div>',
-            unsafe_allow_html=True,
-        )
-        return
-    for index in range(0, min(len(actions), 6), 2):
-        action_columns = st.columns(2)
-        for column, action in zip(action_columns, actions[index : index + 2]):
-            with column:
-                render_action_card(action)
+    st.markdown('<div class="section-title">Latest activity</div>', unsafe_allow_html=True)
+    render_activity_timeline(actions)
 
 
 def page_review_queue(actions, open_escalations):
