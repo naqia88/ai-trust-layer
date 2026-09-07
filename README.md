@@ -27,7 +27,7 @@ The project is publicly deployed in two forms:
 | Deployment                    | URL                                              | Description                          |
 | ----------------------------- | ------------------------------------------------ | ------------------------------------ |
 | React Frontend (GitHub Pages) | https://naqia88.github.io/ai-trust-layer/      | Modern Vite + React risk dashboard   |
-| Streamlit Dashboard           | https://ai-trust-layer.streamlit.app/            | Original Streamlit monitoring app    |
+| Streamlit Dashboard (Draft Version)          | https://ai-trust-layer.streamlit.app/            | Original Streamlit monitoring app    |
 
 Both deployments are tied to the GitHub `main` branch and update automatically after pushed changes.
 
