@@ -20,6 +20,19 @@ The **AI Trust Layer** sits between an AI agent and the real world. It intercept
 
 ---
 
+## Live Deployments
+
+The project is publicly deployed in two forms:
+
+| Deployment                    | URL                                              | Description                          |
+| ----------------------------- | ------------------------------------------------ | ------------------------------------ |
+| React Frontend (GitHub Pages) | https://naqia88.github.io/ai-trust-layer/      | Modern Vite + React risk dashboard   |
+| Streamlit Dashboard           | https://ai-trust-layer.streamlit.app/            | Original Streamlit monitoring app    |
+
+Both deployments are tied to the GitHub `main` branch and update automatically after pushed changes.
+
+---
+
 ## Evaluation Pipeline
 
 ```text
@@ -103,6 +116,17 @@ ai-trust-layer/
 │
 ├── dashboard/
 │   └── app.py                # Streamlit monitoring dashboard
+│
+├── frontend/                 # Modern React frontend
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── src/
+│       ├── App.tsx
+│       ├── index.css
+│       ├── main.tsx
+│       ├── pages/
+│       └── components/
 │
 ├── rag/                      # Optional RAG modules
 │   ├── loader.py             # Loads company policy into ChromaDB
@@ -220,6 +244,62 @@ http://localhost:8501
 
   * Filter by decision type
   * Filter by action type
+
+---
+
+## Running the React Frontend
+
+A modern React frontend is available in the `frontend/` directory. It is built with Vite 8, React 19, TypeScript 5.7, and Tailwind CSS v4.
+
+### Local Development
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend will be available at:
+
+```text
+http://localhost:5173
+```
+
+### Build for Production
+
+```bash
+cd frontend
+npm run build
+```
+
+The production build is output to `frontend/dist`.
+
+### Deployment
+
+The React frontend is auto-deployed to GitHub Pages via `.github/workflows/deploy.yml` whenever changes are pushed to `main` under `frontend/` or the workflow file. The live deployment is available at:
+
+```text
+https://naqia88.github.io/ai-trust-layer/
+```
+
+### Frontend Features
+
+* **Overview Page**
+  * Key metrics and decision-band breakdown
+  * Recent activity summary
+
+* **Review Queue**
+  * Escalated actions awaiting human approval or rejection
+
+* **Audit History**
+  * Complete audit trail with detailed reasoning
+
+* **Test Action**
+  * Submit manual actions for all supported action types
+  * Built-in test presets
+
+* **Theme Toggle**
+  * Dark-first design system with light/dark mode switch
 
 ---
 
@@ -471,6 +551,8 @@ If port `8000` is occupied, use another API port:
 python -m uvicorn api.main:app --reload --port 8001
 ```
 
+If port `5173` is occupied, Vite will prompt you to use the next available port automatically.
+
 ### `GOOGLE_API_KEY` Not Found
 
 Make sure:
@@ -571,8 +653,14 @@ At a high level, the system follows this architecture:
                               │
                               ▼
                     ┌───────────────────┐
-                    │ Streamlit         │
-                    │ Dashboard         │
+                    │  Streamlit        │
+                    │  Dashboard        │
+                    └───────────────────┘
+                              │
+                              ▼
+                    ┌───────────────────┐
+                    │  React Frontend   │
+                    │  (Vite + React)   │
                     └───────────────────┘
 ```
 
@@ -585,7 +673,10 @@ At a high level, the system follows this architecture:
 | Language                  | Python                |
 | AI Model                  | Google Gemini         |
 | API                       | FastAPI               |
-| Dashboard                 | Streamlit             |
+| Streamlit Dashboard       | Streamlit             |
+| React Frontend            | Vite 8 + React 19     |
+| Frontend Styling          | Tailwind CSS v4       |
+| Frontend Language         | TypeScript 5.7        |
 | Data Validation           | Pydantic              |
 | Database                  | SQLite                |
 | Environment Configuration | python-dotenv         |
@@ -609,8 +700,10 @@ The current implementation demonstrates an AI agent trust and oversight layer ca
 * Escalating high-risk actions for human review
 * Blocking critical actions
 * Maintaining an audit trail
-* Providing a monitoring dashboard
+* Providing a Streamlit monitoring dashboard
+* Providing a modern React frontend
 * Exposing a REST API
+* Auto-deploying the frontend to GitHub Pages
 
 ---
 
