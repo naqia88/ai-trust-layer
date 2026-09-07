@@ -655,6 +655,51 @@ def render_styles():
                 border-color: #f97316 !important;
                 box-shadow: 0 0 0 1px #f97316 !important;
             }
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] > div,
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] > div > div,
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] [role="button"],
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] input,
+            [data-testid="stSidebar"] [data-testid="stMultiSelectTagsContainer"],
+            [data-testid="stSidebar"] [data-tag] {
+                color: #000000 !important;
+                background: #ffffff !important;
+                border-color: #f97316 !important;
+            }
+            [data-testid="stSidebar"] [data-tag] span,
+            [data-testid="stSidebar"] [data-tag] button,
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] [data-testid="stMarkdownContainer"] {
+                color: #000000 !important;
+            }
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] svg,
+            [data-testid="stSidebar"] [data-tag] svg {
+                fill: #000000 !important;
+            }
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] [role="listbox"] {
+                background: #ffffff !important;
+                border-color: #f97316 !important;
+            }
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] [role="option"] {
+                color: #000000 !important;
+                background: #ffffff !important;
+            }
+            [data-testid="stSidebar"] [data-testid="stMultiSelect"] [role="option"]:hover {
+                background: #ffedd5 !important;
+            }
+            input[placeholder="Search actions..."] {
+                background: #f97316 !important;
+                color: #000000 !important;
+                border-color: #f97316 !important;
+                font-weight: 600 !important;
+            }
+            input[placeholder="Search actions..."]::placeholder {
+                color: #000000 !important;
+                opacity: 0.9 !important;
+            }
+            input[placeholder="Search actions..."]:focus {
+                background: #f97316 !important;
+                border-color: #000000 !important;
+                box-shadow: 0 0 0 1px #000000 !important;
+            }
             .js-plotly-plot .plotly text,
             .js-plotly-plot .plotly .gtitle,
             .js-plotly-plot .plotly .legendtext,
@@ -1021,6 +1066,11 @@ def style_figure(fig):
             yanchor="bottom",
             y=-0.25,
             font=dict(color="#000000"),
+        ),
+        hoverlabel=dict(
+            bgcolor="#ffffff",
+            bordercolor="#f97316",
+            font=dict(color="#000000", size=13),
         ),
     )
     fig.update_xaxes(showgrid=False, zeroline=False, tickfont=dict(color="#000000"))
