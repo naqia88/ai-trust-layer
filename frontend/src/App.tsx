@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+
+let apiAuthHeader: string | null = null;
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -7,6 +9,7 @@ async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(apiAuthHeader ? { Authorization: apiAuthHeader } : {}),
       ...options?.headers,
     },
   });
@@ -891,7 +894,7 @@ function PageAuditHistory({ actions }: { actions: Action[] }) {
 
 // ─── Test Action page ─────────────────────────────────────────────────────────
 
-function PageTestAction({ onActionCreated }: { onActionCreated: () => Promise<void> }) {
+function PageTestAction({ onActionCreated }: { onActionCreated: () => Promise<unknown> })  {
   const [mode, setMode] = useState<"sample" | "custom">("sample");
   const [result, setResult] = useState<{ decision: string; score: number; actionId?: number } | null>(null);
   const [sampleIndex, setSampleIndex] = useState(0);
@@ -1196,14 +1199,34 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [actions, setActions] = useState<Action[]>([]);
   const [apiError, setApiError] = useState("");
+  const [apiUsername, setApiUsername] = useState("");
+  const [apiPassword, setApiPassword] = useState("");
 
-  const refreshActions = async () => {
+  const refreshActions = async (): Promise<boolean> => {
     try {
       const rows = await apiRequest<unknown[]>("/actions");
       setActions(rows.map(normalizeAction));
       setApiError("");
+      return true;
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Unable to load actions.");
+      return false;
+    }
+  };
+
+  const handleApiLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!apiUsername.trim() || !apiPassword) {
+      setApiError("Enter the API username and password from Render.");
+      return;
+    }
+
+    apiAuthHeader = `Basic ${btoa(`${apiUsername}:${apiPassword}`)}`;
+    const authenticated = await refreshActions();
+    if (authenticated) {
+      setApiPassword("");
+    } else {
+      apiAuthHeader = null;
     }
   };
 
@@ -1306,6 +1329,58 @@ export default function App() {
               API connection failed: {apiError}
             </p>
           )}
+
+          {apiError.includes("API error 401") && (
+            <form
+              onSubmit={(event) => { void handleApiLogin(event); }}
+              className="mb-6 max-w-md rounded-2xl p-5 space-y-4"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-card)" }}
+            >
+              <div>
+                <h3 className="font-bold text-lg" style={{ color: "var(--text)" }}>Backend sign in</h3>
+                <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+                  Enter the API username and password configured in Render.
+                </p>
+              </div>
+              <div>
+                <label htmlFor="api-username" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--text-muted)" }}>
+                  API username
+                </label>
+                <input
+                  id="api-username"
+                  value={apiUsername}
+                  onChange={(event) => setApiUsername(event.target.value)}
+                  autoComplete="username"
+                  required
+                  className="w-full rounded-xl px-4 py-3 text-sm"
+                  style={{ background: "var(--surface-2)", color: "var(--text)", border: "1px solid var(--border-bright)" }}
+                />
+              </div>
+              <div>
+                <label htmlFor="api-password" className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--text-muted)" }}>
+                  API password
+                </label>
+                <input
+                  id="api-password"
+                  type="password"
+                  value={apiPassword}
+                  onChange={(event) => setApiPassword(event.target.value)}
+                  autoComplete="current-password"
+                  required
+                  className="w-full rounded-xl px-4 py-3 text-sm"
+                  style={{ background: "var(--surface-2)", color: "var(--text)", border: "1px solid var(--border-bright)" }}
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+                style={{ background: "var(--accent)", color: "var(--text)" }}
+              >
+                Sign in to backend
+              </button>
+            </form>
+          )}
+
           {nav === "Overview" && <PageOverview actions={filteredActions} />}
           {nav === "Review Queue" && <PageReviewQueue actions={filteredActions} onResolve={resolveAction} />}
           {nav === "Audit History" && <PageAuditHistory actions={filteredActions} />}

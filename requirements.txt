@@ -2,3 +2,5 @@ streamlit
 python-dotenv
 plotly
 pandas
+fastapi
+uvicorn[standard]
