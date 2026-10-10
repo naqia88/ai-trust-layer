@@ -1,5 +1,6 @@
 # Import FastAPI, request validation helpers, and the trust-layer services.
 from typing import Literal
+from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -11,7 +12,19 @@ from trust.interceptor import intercept_action
 
 # Create the local API application used by worker agents and the dashboard.
 app = FastAPI(title="AI Trust Layer")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "https://naqia88.github.io",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Validate requests while preserving the required action details structure.
 class ActionRequest(BaseModel):
